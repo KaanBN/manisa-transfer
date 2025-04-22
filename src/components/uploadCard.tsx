@@ -8,12 +8,12 @@ import {Input} from "@/components/ui/input.tsx";
 import {CirclePlusIcon, FolderPlusIcon, Trash} from "lucide-react";
 import {Textarea} from "@/components/ui/textarea.tsx";
 
-type UploadCardProps = {
-    onFilesUploaded: (files: UploadedFileModel[]) => void;
-};
-
-function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
+function UploadCard(): JSX.Element {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFileModel[]>([]);
+
+    const handleFilesUploaded = (newFiles: UploadedFileModel[]) => {
+        setUploadedFiles(prev => [...prev, ...newFiles]);
+    };
 
     const onDropFiles = useCallback((acceptedFiles: File[]) => {
         const mappedFiles: UploadedFileModel[] = acceptedFiles.map(file => ({
@@ -21,9 +21,8 @@ function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
             size: file.size,
             oneTimeDownload: false,
         }));
-        setUploadedFiles(prev => [...prev, ...mappedFiles]);
-        onFilesUploaded(mappedFiles);
-    }, [onFilesUploaded]);
+        handleFilesUploaded(mappedFiles); // ✔ sadece burada çağırıyoruz
+    }, [handleFilesUploaded]);
 
     const onDropFolders = useCallback((acceptedFiles: File[]) => {
         const mappedFiles: UploadedFileModel[] = acceptedFiles.map(file => ({
@@ -31,9 +30,8 @@ function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
             size: file.size,
             oneTimeDownload: false,
         }));
-        setUploadedFiles(prev => [...prev, ...mappedFiles]);
-        onFilesUploaded(mappedFiles);
-    }, [onFilesUploaded]);
+        handleFilesUploaded(mappedFiles); // ✔ sadece burada çağırıyoruz
+    }, [handleFilesUploaded]);
 
     const { getRootProps: getFileRootProps, getInputProps: getFileInputProps } = useDropzone({
         onDrop: onDropFiles,
@@ -81,7 +79,7 @@ function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
                     </div>
                 </div>
 
-                {uploadedFiles.length > 0 && (
+                {uploadedFiles.length > 0 ? (
                     <div className="space-y-2">
                         {uploadedFiles.map((file, index) => (
                             <div
@@ -106,17 +104,12 @@ function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
                             </div>
                         ))}
                     </div>
+                ) : (
+                    <div className="text-sm text-muted-foreground text-center">
+                        Paylaşmak için dosya ekleyin.
+                    </div>
                 )}
 
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="title">Başlık</Label>
-                    <Input id="title" placeholder="Başlık" />
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="message">Mesaj</Label>
-                    <Textarea className="min-h-[100px] max-h-[200px]" placeholder="Mesajınızı buraya yazabilirsiniz." id="message" />
-                </div>
             </CardContent>
             <CardFooter className="flex">
                 <Button className={"w-full"}>Gönder</Button>
