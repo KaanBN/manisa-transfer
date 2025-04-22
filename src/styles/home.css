@@ -1,0 +1,3 @@
+.home-background {
+    @apply bg-cover bg-center bg-no-repeat;
+}

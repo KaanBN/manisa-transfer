@@ -1,0 +1,7 @@
+.div-btn-upload {
+    @apply w-full;
+}
+
+.btn-upload {
+    @apply bg-blue-100 hover:bg-blue-200 p-3 rounded-xl w-full transition flex flex-col items-center justify-center;
+}

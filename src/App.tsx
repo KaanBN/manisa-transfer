@@ -1,30 +1,32 @@
-import { useState } from 'react'
-import viteLogo from '/vite.svg'
+import {JSX, useState} from 'react';
+import bg from './assets/images/background.png';
+import Navbar from "@/components/navbar";
+import UploadCard from "@/components/uploadCard.tsx";
+import {UploadedFileModel} from "@/models/uploadedFileModel.ts";
 
-function App() {
-  const [count, setCount] = useState(0)
+function App(): JSX.Element {
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFileModel[]>([]);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleFilesUploaded = (newFiles: UploadedFileModel[]) => {
+        setUploadedFiles(prev => [...prev, ...newFiles]);
+    };
+
+    return (
+        <div
+            className="home-background min-h-screen w-full"
+            style={{
+                backgroundImage: `url(${bg})`
+            }}
+        >
+            <Navbar />
+
+            <div className="flex justify-between items-center px-6 py-8 gap-6 h-[calc(100vh-80px)]">
+                <div className="flex-row flex flex-auto gap-2">
+                    <UploadCard onFilesUploaded={handleFilesUploaded} />
+                </div>
+            </div>
+        </div>
+    );
 }
 
-export default App
+export default App;
