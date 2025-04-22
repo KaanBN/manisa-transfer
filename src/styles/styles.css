@@ -3,4 +3,5 @@
 @import "./home.css";
 @import "./components/navbar.css";
 @import "./components/uploadCard.css";
+@import "../index.css";
 
