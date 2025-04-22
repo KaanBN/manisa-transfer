@@ -3,6 +3,7 @@ import bg from './assets/images/background.png';
 import Navbar from "@/components/navbar";
 import UploadCard from "@/components/uploadCard.tsx";
 import UserFileTableCard from "@/components/userFileTableCard.tsx";
+import {Toaster} from "@/components/ui/sonner.tsx";
 
 function App(): JSX.Element {
     return (
@@ -10,6 +11,7 @@ function App(): JSX.Element {
             className="home-background min-h-screen w-full"
             style={{ backgroundImage: `url(${bg})` }}
         >
+            <Toaster />
             <Navbar />
 
             <div className="flex flex-col lg:flex-row justify-between items-stretch px-6 py-8 gap-6 h-[calc(100vh-80px)]">

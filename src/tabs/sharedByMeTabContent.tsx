@@ -542,7 +542,7 @@ const columns: ColumnDef<SharedFile>[] = [
 ]
 
 export default function SharedByMeTabContent(): JSX.Element {
-    const [filter, setFilter] = React.useState("")
+    const [filter, setFilter] = React.useState("");
 
     const table = useReactTable({
         data,

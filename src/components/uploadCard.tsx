@@ -3,13 +3,13 @@ import { useDropzone } from "react-dropzone";
 import {UploadedFileModel} from "@/models/uploadedFileModel.ts";
 import {Card, CardContent, CardFooter} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Label} from "@/components/ui/label.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import { toast } from "sonner"
 import {CirclePlusIcon, FolderPlusIcon, Trash} from "lucide-react";
-import {Textarea} from "@/components/ui/textarea.tsx";
+import SendFilesDialog from "@/components/sendFilesDialog.tsx";
 
 function UploadCard(): JSX.Element {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFileModel[]>([]);
+    const [openSendFilesDialog, setOpenSendFilesDialog] = useState(false)
 
     const handleFilesUploaded = (newFiles: UploadedFileModel[]) => {
         setUploadedFiles(prev => [...prev, ...newFiles]);
@@ -112,7 +112,18 @@ function UploadCard(): JSX.Element {
 
             </CardContent>
             <CardFooter className="flex">
-                <Button className={"w-full"}>Gönder</Button>
+                <Button
+                    onClick={() => {
+                        if (uploadedFiles.length === 0) {
+                            toast("Lütfen en az bir dosya yükleyin.")
+                        }
+                        else {
+                            setOpenSendFilesDialog(true);
+                        }
+                    }}
+                    className={"w-full"}>Gönder</Button>
+
+                <SendFilesDialog open={openSendFilesDialog} setOpen={setOpenSendFilesDialog} />
             </CardFooter>
         </Card>
 
