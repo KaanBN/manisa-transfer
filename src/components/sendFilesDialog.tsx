@@ -1,10 +1,7 @@
-"use client"
-
 import { useState } from "react"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -59,15 +56,12 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Dosya Gönder</DialogTitle>
-                    <DialogDescription>
-                        Başlık, mesaj, şifre ve alıcı bilgilerini girerek dosyayı paylaş.
-                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4 w-full">
                     <div>
                         <Label htmlFor="title" className="mb-1">Başlık</Label>
-                        <Input id="title" placeholder="Dosya başlığı" />
+                        <Input id="title" placeholder="Başlık" />
                     </div>
 
                     <div>

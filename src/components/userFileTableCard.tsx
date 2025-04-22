@@ -11,6 +11,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 import SharedByMeTabContent from "@/tabs/sharedByMeTabContent.tsx";
+import SharedWithMeTabContent from "@/tabs/sharedWithMe.tsx";
 
 function UserFileTableCard(): JSX.Element {
     return (
@@ -28,7 +29,7 @@ function UserFileTableCard(): JSX.Element {
                         <SharedByMeTabContent />
                     </TabsContent>
                     <TabsContent value="shared-with-me">
-                        <div>Benimle paylaşılan dosyalar burada olacak</div>
+                        <SharedWithMeTabContent />
                     </TabsContent>
                 </CardContent>
             </Card>
