@@ -1,11 +1,10 @@
 import {useState, useCallback, JSX} from "react";
 import { useDropzone } from "react-dropzone";
 import {UploadedFileModel} from "@/models/uploadedFileModel.ts";
-import {Card, CardAction, CardContent, CardFooter} from "@/components/ui/card.tsx";
+import {Card, CardContent, CardFooter} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {CirclePlusIcon, FolderPlusIcon, Trash} from "lucide-react";
 import {Textarea} from "@/components/ui/textarea.tsx";
 
@@ -116,7 +115,7 @@ function UploadCard({ onFilesUploaded }: UploadCardProps): JSX.Element {
 
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor="message">Mesaj</Label>
-                    <Textarea className="min-h-[100px]" placeholder="Mesajınızı buraya yazabilirsiniz." id="message" />
+                    <Textarea className="min-h-[100px] max-h-[200px]" placeholder="Mesajınızı buraya yazabilirsiniz." id="message" />
                 </div>
             </CardContent>
             <CardFooter className="flex">
