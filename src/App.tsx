@@ -13,7 +13,7 @@ function App(): JSX.Element {
                 backgroundImage: `url(${bg})`,
             }}
         >
-            <Toaster />
+            <Toaster richColors={true} />
             <Navbar />
 
             <div className="flex flex-col lg:flex-row justify-between p-6 gap-6 self-center">
@@ -25,6 +25,10 @@ function App(): JSX.Element {
                     <UserFileTableCard />
                 </div>
             </div>
+
+            <footer className="text-center text-xs text-white py-4">
+                © {new Date().getFullYear()} Spiltech. Tüm hakları saklıdır.
+            </footer>
         </div>
     );
 }

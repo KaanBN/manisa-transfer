@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-
 import {
     Select,
     SelectContent,
@@ -20,18 +18,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {UserSelect} from "@/components/userSelect.tsx";
 
-const users = [
-    "Ahmet Yılmaz",
-    "Zeynep Kılıç",
-    "Burak Demir",
-    "Elif Şahin",
-    "Mehmet Yıldız",
-    "Ayşe Güneş",
-    "Canan Arslan",
+const durations = [
+    { label: "1 Gün", value: "one_day" },
+    { label: "2 Gün", value: "two_days" },
+    { label: "3 Gün", value: "three_days" },
+    { label: "1 Hafta", value: "one_week" },
+    { label: "1 Ay", value: "one_month" },
+    { label: "Süresiz", value: "indefinite" },
 ]
-
-//const durations = ["1 gün", "3 gün", "1 hafta", "Süresiz"]
 
 type SendFilesDialogProps = {
     open: boolean
@@ -39,20 +35,8 @@ type SendFilesDialogProps = {
 }
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
-    const [search, setSearch] = useState("")
-    const [selectedUsers, setSelectedUers] = useState<string[]>([])
     const [password, setPassword] = useState("")
-    //const [duration, setDuration] = useState("1 gün")
-
-    const filteredUsers = users.filter((u) =>
-        u.toLowerCase().includes(search.toLowerCase())
-    )
-
-    const toggleUser = (name: string) => {
-        setSelectedUers((prev) =>
-            prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
-        )
-    }
+    const [selectedUser, setSelectedUser] = useState("")
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -62,13 +46,13 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4 w-full">
-                    <div>
-                        <Label htmlFor="title" className="mb-1">Başlık</Label>
+                    <div className={"grid gap-2"}>
+                        <Label htmlFor="title">Başlık</Label>
                         <Input id="title" placeholder="Başlık" />
                     </div>
 
-                    <div>
-                        <Label htmlFor="message" className="mb-1">Mesaj</Label>
+                    <div className={"grid gap-2"}>
+                        <Label htmlFor="message">Mesaj</Label>
                         <Textarea
                             id="message"
                             placeholder="Mesajınızı yazın..."
@@ -77,8 +61,8 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="sm:flex-1">
-                            <Label htmlFor="password" className="mb-1">Şifre (opsiyonel)</Label>
+                        <div className="sm:flex-1 grid gap-2">
+                            <Label htmlFor="password">Şifre (opsiyonel)</Label>
                             <Input
                                 id="password"
                                 type="password"
@@ -87,56 +71,26 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
-                        <div className="sm:flex-1">
-                            <Label className="mb-1">Süre</Label>
+                        <div className="sm:flex-1 grid gap-2">
+                            <Label>Süre</Label>
                             <Select>
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a fruit" />
+                                    <SelectValue placeholder="Saklanacak süre" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem value="apple">Apple</SelectItem>
-                                        <SelectItem value="banana">Banana</SelectItem>
-                                        <SelectItem value="blueberry">Blueberry</SelectItem>
-                                        <SelectItem value="grapes">Grapes</SelectItem>
-                                        <SelectItem value="pineapple">Pineapple</SelectItem>
+                                        {durations.map((item) => (
+                                            <SelectItem key={item.value} value={item.value}>
+                                                {item.label}
+                                            </SelectItem>
+                                        ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-
                         </div>
                     </div>
 
-                    <div>
-                        <Label htmlFor="search" className="mb-1">Kime Gönderilecek</Label>
-                        <Input
-                            id="search"
-                            placeholder="Kullanıcı ara..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                        <ScrollArea className="h-40 mt-2 rounded border">
-                            {filteredUsers.map((name) => (
-                                <div
-                                    key={name}
-                                    className={`cursor-pointer px-4 py-2 hover:bg-accent ${
-                                        selectedUsers.includes(name) ? "bg-green-50 font-medium hover:bg-green-100" : ""
-                                    }`}
-                                    onClick={() => toggleUser(name)}
-                                >
-                                    {name}
-                                    {selectedUsers.includes(name) && (
-                                        <span className="ml-2 text-green-500">✓</span>
-                                    )}
-                                </div>
-                            ))}
-                            {filteredUsers.length === 0 && (
-                                <div className="p-4 text-sm text-muted-foreground">
-                                    Eşleşen kullanıcı bulunamadı.
-                                </div>
-                            )}
-                        </ScrollArea>
-                    </div>
+                    <UserSelect value={selectedUser} onChange={setSelectedUser} />
                 </div>
 
                 <DialogFooter>

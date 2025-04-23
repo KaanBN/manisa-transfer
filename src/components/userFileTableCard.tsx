@@ -15,21 +15,21 @@ import SharedWithMeTabContent from "@/tabs/sharedWithMe.tsx";
 
 function UserFileTableCard(): JSX.Element {
     return (
-        <Tabs defaultValue="shared-by-me" className="h-full">
+        <Tabs defaultValue="shared-with-me" className="h-full">
             <Card className="flex flex-col h-full">
                 <CardHeader>
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="shared-by-me">Paylaştıklarım</TabsTrigger>
                         <TabsTrigger value="shared-with-me">Paylaşılanlar</TabsTrigger>
+                        <TabsTrigger value="shared-by-me">Paylaştıklarım</TabsTrigger>
                     </TabsList>
                 </CardHeader>
 
                 <CardContent className="flex-1 overflow-auto">
-                    <TabsContent value="shared-by-me" className="h-full">
-                        <SharedByMeTabContent />
-                    </TabsContent>
                     <TabsContent value="shared-with-me" className="h-full">
                         <SharedWithMeTabContent />
+                    </TabsContent>
+                    <TabsContent value="shared-by-me" className="h-full">
+                        <SharedByMeTabContent />
                     </TabsContent>
                 </CardContent>
             </Card>
