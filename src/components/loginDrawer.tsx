@@ -8,6 +8,7 @@ import {
     DrawerTitle
 } from "@/components/ui/drawer.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {Input} from "@/components/ui/input.tsx";
 
 type LoginDrawerProps = {
     open: boolean;
@@ -25,15 +26,15 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
                     </DrawerHeader>
                     <div className="p-4">
 
-                        <input
+                        <Input
                             type="email"
                             placeholder="Email"
-                            className="w-full mb-2 px-3 py-2 border rounded"
+                            className="mb-4"
                         />
-                        <input
+
+                        <Input
                             type="password"
                             placeholder="Şifre"
-                            className="w-full px-3 py-2 border rounded"
                         />
                     </div>
                     <DrawerFooter>

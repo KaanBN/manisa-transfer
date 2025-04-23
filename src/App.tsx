@@ -8,18 +8,20 @@ import {Toaster} from "@/components/ui/sonner.tsx";
 function App(): JSX.Element {
     return (
         <div
-            className="home-background min-h-screen w-full"
-            style={{ backgroundImage: `url(${bg})` }}
+            className="bg-cover bg-no-repeat min-h-screen"
+            style={{
+                backgroundImage: `url(${bg})`,
+            }}
         >
             <Toaster />
             <Navbar />
 
-            <div className="flex flex-col lg:flex-row justify-between items-stretch px-6 py-8 gap-6 h-[calc(100vh-80px)]">
-                <div className="w-full md:min-w-[320px] lg:self-center md:max-w-sm">
+            <div className="flex flex-col lg:flex-row justify-between p-6 gap-6 self-center">
+                <div className="lg:self-center">
                     <UploadCard />
                 </div>
 
-                <div className="flex-1 w-full">
+                <div className="flex-1 min-w-0 lg:self-center md:h-[80vh]">
                     <UserFileTableCard />
                 </div>
             </div>

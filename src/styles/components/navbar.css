@@ -1,5 +1,5 @@
 .navbar-container {
-    @apply flex flex-wrap items-center justify-end mx-auto p-[1rem];
+    @apply flex flex-wrap items-center justify-end mx-auto py-4 px-6;
 }
 
 .navbar-actions {

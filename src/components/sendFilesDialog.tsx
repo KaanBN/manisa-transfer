@@ -11,12 +11,15 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const users = [
     "Ahmet Yılmaz",
@@ -28,7 +31,7 @@ const users = [
     "Canan Arslan",
 ]
 
-const durations = ["1 gün", "3 gün", "1 hafta", "Süresiz"]
+//const durations = ["1 gün", "3 gün", "1 hafta", "Süresiz"]
 
 type SendFilesDialogProps = {
     open: boolean
@@ -39,7 +42,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
     const [search, setSearch] = useState("")
     const [selectedUsers, setSelectedUers] = useState<string[]>([])
     const [password, setPassword] = useState("")
-    const [duration, setDuration] = useState("1 gün")
+    //const [duration, setDuration] = useState("1 gün")
 
     const filteredUsers = users.filter((u) =>
         u.toLowerCase().includes(search.toLowerCase())
@@ -86,23 +89,21 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                         </div>
                         <div className="sm:flex-1">
                             <Label className="mb-1">Süre</Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="w-full text-left">
-                                        {duration}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-full">
-                                    {durations.map((item) => (
-                                        <DropdownMenuItem
-                                            key={item}
-                                            onClick={() => setDuration(item)}
-                                        >
-                                            {item}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Select>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select a fruit" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="apple">Apple</SelectItem>
+                                        <SelectItem value="banana">Banana</SelectItem>
+                                        <SelectItem value="blueberry">Blueberry</SelectItem>
+                                        <SelectItem value="grapes">Grapes</SelectItem>
+                                        <SelectItem value="pineapple">Pineapple</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+
                         </div>
                     </div>
 

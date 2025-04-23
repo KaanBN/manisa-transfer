@@ -21,7 +21,7 @@ function UploadCard(): JSX.Element {
             size: file.size,
             oneTimeDownload: false,
         }));
-        handleFilesUploaded(mappedFiles); // ✔ sadece burada çağırıyoruz
+        handleFilesUploaded(mappedFiles);
     }, [handleFilesUploaded]);
 
     const onDropFolders = useCallback((acceptedFiles: File[]) => {
@@ -30,7 +30,7 @@ function UploadCard(): JSX.Element {
             size: file.size,
             oneTimeDownload: false,
         }));
-        handleFilesUploaded(mappedFiles); // ✔ sadece burada çağırıyoruz
+        handleFilesUploaded(mappedFiles);
     }, [handleFilesUploaded]);
 
     const { getRootProps: getFileRootProps, getInputProps: getFileInputProps } = useDropzone({
@@ -54,30 +54,28 @@ function UploadCard(): JSX.Element {
     };
 
     return (
-        <Card className="w-[17.5em] h-[30em]">
+        <Card className="lg:w-[17.5em] w-full max-h-[30em]">
             <CardContent className="h-full flex flex-col overflow-y-auto relative space-y-4">
-                <div className="flex items-center justify-center gap-1">
-                    <div className="div-btn-upload" {...getFileRootProps()}>
+                <div className="flex justify-center gap-1">
+                    <div {...getFileRootProps()} className="cursor-pointer w-full lg:w-auto">
                         <input {...getFileInputProps()} id="fileInput" />
-                        <Button onClick={handleFileClick}>
-                            <CirclePlusIcon />
-                            Dosya Yükle
-                        </Button>
+                        <div className="flex flex-col items-center gap-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl"
+                             onClick={handleFileClick}>
+                            <CirclePlusIcon className="w-6 h-6 text-gray-700" />
+                            <span className="text-sm font-medium text-gray-800 text-center">Dosya Yükle</span>
+                        </div>
                     </div>
 
-                    <div className="div-btn-upload" {...getFolderRootProps()}>
-                        <input
-                            {...getFolderInputProps()}
-                            id="folderInput"
-                            webkitdirectory=""
-                            type="file"
-                        />
-                        <Button onClick={handleFolderClick}>
-                            <FolderPlusIcon />
-                            Klasör Yükle
-                        </Button>
+                    <div {...getFolderRootProps()} className="cursor-pointer w-full lg:w-auto">
+                        <input {...getFolderInputProps()} id="folderInput" type="file" webkitdirectory="" />
+                        <div className="flex flex-col items-center gap-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl"
+                            onClick={handleFolderClick}>
+                            <FolderPlusIcon className="w-6 h-6 text-gray-700" />
+                            <span className="text-sm font-medium text-gray-800 text-center">Klasör Yükle</span>
+                        </div>
                     </div>
                 </div>
+
 
                 {uploadedFiles.length > 0 ? (
                     <div className="space-y-2">
@@ -87,20 +85,15 @@ function UploadCard(): JSX.Element {
                                 className="bg-gray-100 rounded-lg px-4 py-2 flex justify-between items-center text-sm"
                             >
                                 <div className="flex-1 truncate text-gray-800">{file.name}</div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-gray-500 text-xs">
-                                    {(file.size / 1024).toFixed(1)} KB
-                                  </span>
-                                    <Trash
-                                        size={16}
-                                        className="text-red-500 cursor-pointer hover:text-red-700"
-                                        onClick={() => {
-                                            setUploadedFiles(prev =>
-                                                prev.filter((_, i) => i !== index)
-                                            );
-                                        }}
-                                    />
-                                </div>
+                                <Trash
+                                    size={16}
+                                    className="text-red-500 cursor-pointer hover:text-red-700"
+                                    onClick={() => {
+                                        setUploadedFiles(prev =>
+                                            prev.filter((_, i) => i !== index)
+                                        );
+                                    }}
+                                />
                             </div>
                         ))}
                     </div>
@@ -115,7 +108,7 @@ function UploadCard(): JSX.Element {
                 <Button
                     onClick={() => {
                         if (uploadedFiles.length === 0) {
-                            toast("Lütfen en az bir dosya yükleyin.")
+                            toast.error("Lütfen en az bir dosya yükleyin.")
                         }
                         else {
                             setOpenSendFilesDialog(true);

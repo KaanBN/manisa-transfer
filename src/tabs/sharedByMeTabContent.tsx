@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-table"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {JSX} from "react";
 
@@ -551,8 +550,8 @@ export default function SharedByMeTabContent(): JSX.Element {
     })
 
     return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
+        <div className="w-full h-full flex flex-col">
+            <div className="py-4">
                 <Input
                     placeholder="Dosya adına göre filtrele..."
                     value={filter}
@@ -560,7 +559,7 @@ export default function SharedByMeTabContent(): JSX.Element {
                     className="max-w-sm"
                 />
             </div>
-            <div className="rounded-md border overflow-x-auto">
+            <div className="flex-1 overflow-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -575,49 +574,24 @@ export default function SharedByMeTabContent(): JSX.Element {
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows
-                                .filter((row) =>
-                                    row.original.fileName.toLowerCase().includes(filter.toLowerCase())
-                                )
-                                .map((row) => (
-                                    <TableRow key={row.id}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell
-                                                key={cell.id}
-                                                className="px-4 py-2 align-top"
-                                            >
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="align-top px-4 py-2">
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell colSpan={table.getAllColumns().length} className="text-center h-24">
                                     Sonuç bulunamadı.
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
-            </div>
-            <div className="flex justify-end space-x-2 py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Geri
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    İleri
-                </Button>
             </div>
         </div>
     )
