@@ -11,11 +11,12 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {JSX} from "react";
+import {forwardRef, useImperativeHandle} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
 import {IncomingFile} from "@/types/incomingFile.ts";
+import {PaginationHandle} from "@/types/paginationHandle.ts";
 
 const data: IncomingFile[] = [
     {
@@ -671,8 +672,8 @@ const columns: ColumnDef<IncomingFile>[] = [
     }
 ]
 
-export default function SharedWithMeTabContent(): JSX.Element {
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
     const table = useReactTable({
         data,
@@ -685,7 +686,14 @@ export default function SharedWithMeTabContent(): JSX.Element {
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-    })
+    });
+
+    useImperativeHandle(ref, () => ({
+        previousPage: () => table.previousPage(),
+        nextPage: () => table.nextPage(),
+        getCanNextPage: () => table.getCanNextPage(),
+        getCanPreviousPage: () => table.getCanPreviousPage(),
+    }));
 
     return (
         <div className="w-full h-full flex flex-col">
@@ -733,24 +741,8 @@ export default function SharedWithMeTabContent(): JSX.Element {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex justify-end space-x-2 py-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Geri
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    İleri
-                </Button>
-            </div>
         </div>
     )
-}
+});
+
+export default SharedWithMeTabContent;
