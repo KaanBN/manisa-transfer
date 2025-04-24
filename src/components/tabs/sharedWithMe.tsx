@@ -5,19 +5,12 @@ import {
     getPaginationRowModel,
     useReactTable,
     flexRender,
-    RowData, ColumnFiltersState,
+    ColumnFiltersState,
     getFilteredRowModel,
 } from "@tanstack/react-table"
-
-declare module '@tanstack/react-table' {
-    interface ColumnMeta<TData extends RowData, TValue> {
-        filterVariant?: 'text' | 'range' | 'select'
-    }
-}
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
+import { Button } from "@/components/ui/button.tsx"
+import { Input } from "@/components/ui/input.tsx"
 import {JSX} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -638,9 +631,6 @@ const columns: ColumnDef<IncomingFile>[] = [
         accessorKey: "from",
         header: "Gönderen",
         cell: ({ row }) => <div className="font-medium">{row.getValue("from")}</div>,
-        meta: {
-            filterVariant: 'text',
-        },
     },
     {
         accessorKey: "title",

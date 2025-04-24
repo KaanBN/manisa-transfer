@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import {
     Card,
-    CardContent,
+    CardContent, CardFooter,
     CardHeader,
 } from "@/components/ui/card";
 import {
@@ -10,8 +10,9 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import SharedByMeTabContent from "@/tabs/sharedByMeTabContent.tsx";
-import SharedWithMeTabContent from "@/tabs/sharedWithMe.tsx";
+import SharedByMeTabContent from "@/components/tabs/sharedByMeTabContent.tsx";
+import SharedWithMeTabContent from "@/components/tabs/sharedWithMe.tsx";
+import {Button} from "@/components/ui/button.tsx";
 
 function UserFileTableCard(): JSX.Element {
     return (
@@ -32,6 +33,21 @@ function UserFileTableCard(): JSX.Element {
                         <SharedByMeTabContent />
                     </TabsContent>
                 </CardContent>
+
+                <CardFooter className={"flex justify-end space-x-2"}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                    >
+                        Geri
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                    >
+                        İleri
+                    </Button>
+                </CardFooter>
             </Card>
         </Tabs>
     );

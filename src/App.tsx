@@ -8,7 +8,7 @@ import {Toaster} from "@/components/ui/sonner.tsx";
 function App(): JSX.Element {
     return (
         <div
-            className="bg-cover bg-no-repeat min-h-screen"
+            className="flex flex-col min-h-screen bg-cover bg-no-repeat"
             style={{
                 backgroundImage: `url(${bg})`,
             }}
@@ -16,7 +16,7 @@ function App(): JSX.Element {
             <Toaster richColors={true} />
             <Navbar />
 
-            <div className="flex flex-col lg:flex-row justify-between p-6 gap-6 self-center">
+            <main className="flex flex-col lg:flex-row justify-between p-6 gap-6 flex-1">
                 <div className="lg:self-center">
                     <UploadCard />
                 </div>
@@ -24,7 +24,7 @@ function App(): JSX.Element {
                 <div className="flex-1 min-w-0 lg:self-center md:h-[80vh]">
                     <UserFileTableCard />
                 </div>
-            </div>
+            </main>
 
             <footer className="text-center text-xs text-white py-4">
                 © {new Date().getFullYear()} Spiltech. Tüm hakları saklıdır.
@@ -32,5 +32,6 @@ function App(): JSX.Element {
         </div>
     );
 }
+
 
 export default App;
