@@ -4,13 +4,17 @@ import {
     getCoreRowModel,
     getPaginationRowModel,
     useReactTable,
-    flexRender,
+    flexRender, ColumnFiltersState, getFilteredRowModel,
 } from "@tanstack/react-table"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import {JSX} from "react";
 import { SharedFile } from "@/types/sharedFile";
+import {Button} from "@/components/ui/button.tsx";
+import {format} from "date-fns";
+import {tr} from "date-fns/locale";
+import {Download} from "lucide-react";
 
 const data: SharedFile[] = [
     {
@@ -617,44 +621,84 @@ const data: SharedFile[] = [
 
 const columns: ColumnDef<SharedFile>[] = [
     {
-        accessorKey: "fileName",
-        header: "Dosya Adı",
-        cell: ({ row }) => <div className="font-medium">{row.getValue("fileName")}</div>,
-    },
-    {
-        accessorKey: "sentTo",
+        accessorKey: "to",
         header: "Gönderilen",
-        cell: ({ row }) => <div>{row.getValue("sentTo")}</div>,
+        cell: ({ row }) => <div className="font-medium">{row.getValue("to")}</div>,
     },
     {
-        accessorKey: "description",
-        header: "Açıklama",
-        cell: ({ row }) => <div>{row.getValue("description")}</div>,
+        accessorKey: "title",
+        header: "Başlık",
+        cell: ({ row }) => <div>{row.getValue("title")}</div>,
     },
+    {
+        accessorKey: "date",
+        header: "Gönderim Zamanı",
+        cell: ({ row }) => {
+            const rawDate = row.getValue("date") as string;
+            const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
+                locale: tr,
+            });
+            return <div>{formatted}</div>;
+        },
+    },
+    {
+        accessorKey: "status",
+        header: "Durum",
+        cell: ({ row }) =>{
+            const status = row.getValue("status") as string;
+            const statusClass = status === "waiting" ? "text-yellow-500" : status === "downloaded" ? "text-green-500" : "text-red-500";
+            const translatedStatus = status === "waiting" ? "Beklemede" : status === "downloaded" ? "İndirildi" : "İndirilmedi";
+            return <div className={`font-medium ${statusClass}`}>{translatedStatus}</div>;
+        },
+    },
+    {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => {
+            const rowData = row.original;
+
+            const handleDownload = () => {
+                console.log(`"${rowData.title}" adlı dosya indiriliyor...`);
+            };
+
+            return (
+                <Button size="sm" onClick={handleDownload}>
+                    <Download />
+                </Button>
+            );
+        },
+    }
 ]
 
 export default function SharedByMeTabContent(): JSX.Element {
-    const [filter, setFilter] = React.useState("");
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
     const table = useReactTable({
         data,
         columns,
+        filterFns: {},
+        state: {
+            columnFilters,
+        },
+        onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        state: {},
     })
 
     return (
         <div className="w-full h-full flex flex-col">
             <div className="py-4">
                 <Input
-                    placeholder="Dosya adına göre filtrele..."
-                    value={filter}
-                    onChange={(event) => setFilter(event.target.value)}
+                    placeholder="Gönderilene göre filtrele..."
+                    value={(table.getColumn("to")?.getFilterValue() as string) ?? ""}
+                    onChange={(event) =>
+                        table.getColumn("to")?.setFilterValue(event.target.value)
+                    }
                     className="max-w-sm"
                 />
             </div>
-            <div className="flex-1 overflow-auto rounded-md border">
+            <div className="flex-1 overflow-y-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -672,7 +716,7 @@ export default function SharedByMeTabContent(): JSX.Element {
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="align-top px-4 py-2">
+                                        <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -687,6 +731,24 @@ export default function SharedByMeTabContent(): JSX.Element {
                         )}
                     </TableBody>
                 </Table>
+            </div>
+            <div className="flex justify-end space-x-2 py-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Geri
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    İleri
+                </Button>
             </div>
         </div>
     )
