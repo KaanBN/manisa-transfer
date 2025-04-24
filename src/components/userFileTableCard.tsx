@@ -11,8 +11,8 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 import SharedByMeTabContent from "@/components/tabs/sharedByMeTabContent.tsx";
-import SharedWithMeTabContent from "@/components/tabs/sharedWithMe.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import SharedWithMeTabContent from "@/components/tabs/sharedWithMeTabContent.tsx";
 
 function UserFileTableCard(): JSX.Element {
     return (

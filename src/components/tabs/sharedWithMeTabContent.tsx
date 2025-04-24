@@ -15,13 +15,7 @@ import {JSX} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
-
-type IncomingFile = {
-    from: string
-    title: string
-    date: string
-    status: string
-}
+import {IncomingFile} from "@/types/incomingFile.ts";
 
 const data: IncomingFile[] = [
     {

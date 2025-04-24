@@ -21,7 +21,7 @@ function App(): JSX.Element {
                     <UploadCard />
                 </div>
 
-                <div className="flex-1 min-w-0 lg:self-center md:h-[80vh]">
+                <div className="flex-1 min-w-0 lg:self-center">
                     <UserFileTableCard />
                 </div>
             </main>
