@@ -664,7 +664,7 @@ const columns: ColumnDef<IncomingFile>[] = [
             };
 
             return (
-                <Button size="sm" onClick={handleDownload}>
+                <Button variant={"ghost"} size="sm" onClick={handleDownload}>
                     <Download />
                 </Button>
             );

@@ -663,7 +663,7 @@ const columns: ColumnDef<SharedFile>[] = [
             };
 
             return (
-                <Button size="sm" onClick={handleDownload}>
+                <Button variant={"ghost"} size="sm" onClick={handleDownload}>
                     <Download />
                 </Button>
             );

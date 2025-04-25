@@ -3,6 +3,7 @@ import {Menubar} from "@radix-ui/react-menubar";
 import {MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger} from "./ui/menubar";
 import { useState } from "react";
 import LoginDrawer from "@/components/loginDrawer.tsx";
+import {ThemeToggle} from "@/components/themeToggle.tsx";
 
 const Navbar: React.FC = () => {
     // const user = useUser();
@@ -35,7 +36,8 @@ const Navbar: React.FC = () => {
                     </Menubar>
                 ) : (
                     <>
-                        <Button onClick={() => setLoginDrawerOpen(true)}>Giriş Yap</Button>
+                        <Button className={"mr-2"} onClick={() => setLoginDrawerOpen(true)}>Giriş Yap</Button>
+                        <ThemeToggle />
 
                         <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen} />
                     </>
