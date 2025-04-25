@@ -1,16 +1,21 @@
 import {JSX} from 'react';
 import bg from './assets/images/background.png';
+import bgDark from './assets/images/background-dark.png';
 import Navbar from "@/components/navbar";
 import UploadCard from "@/components/uploadCard.tsx";
 import UserFileTableCard from "@/components/userFileTableCard.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
+import {useTheme} from "@/components/themeProvider.tsx";
 
 function App(): JSX.Element {
+
+    const { theme } = useTheme()
+
     return (
         <div
             className="flex flex-col min-h-screen bg-cover bg-no-repeat"
             style={{
-                backgroundImage: `url(${bg})`,
+                backgroundImage: `url(${theme === 'dark' ? bgDark : bg})`,
             }}
         >
             <Toaster richColors={true} />
