@@ -73,7 +73,7 @@ function UserFileTableCard(): JSX.Element {
 
     return (
         <Tabs defaultValue="shared-with-me" onValueChange={setActiveTab}>
-            <Card className="flex flex-col overflow-y-auto lg:min-h-[75vh] xl:min-h-[770px] lg:max-h-[75vh]">
+            <Card className="flex flex-col overflow-y-auto lg:min-h-[75vh] 2xl:min-h-[770px] lg:max-h-[75vh]">
                 <CardHeader>
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="shared-with-me">Paylaşılanlar</TabsTrigger>
