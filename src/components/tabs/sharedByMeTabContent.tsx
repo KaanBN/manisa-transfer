@@ -710,7 +710,9 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow
+                                className={"hover:bg-gray-200 bg-gray-200"}
+                                key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id}>
                                         {flexRender(header.column.columnDef.header, header.getContext())}
