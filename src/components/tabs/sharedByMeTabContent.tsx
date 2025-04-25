@@ -711,7 +711,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow
-                                className={"hover:bg-gray-200 bg-gray-200"}
+                                className={"hover:bg-muted bg-muted"}
                                 key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id}>

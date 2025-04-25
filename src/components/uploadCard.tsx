@@ -6,6 +6,7 @@ import {Button} from "@/components/ui/button.tsx";
 import { toast } from "sonner"
 import {CirclePlusIcon, FolderPlusIcon, Trash} from "lucide-react";
 import SendFilesDialog from "@/components/sendFilesDialog.tsx";
+import {Label} from "@/components/ui/label.tsx";
 
 function UploadCard(): JSX.Element {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFileModel[]>([]);
@@ -57,22 +58,22 @@ function UploadCard(): JSX.Element {
         <Card className="lg:w-[17.5em] w-full max-h-[30em]">
             <CardContent className="h-full flex flex-col overflow-y-auto relative space-y-4">
                 <div className="flex justify-center gap-1">
-                    <div {...getFileRootProps()} className="cursor-pointer w-full lg:w-auto">
+                    <div {...getFileRootProps()} className="w-full lg:w-auto">
                         <input {...getFileInputProps()} id="fileInput" />
-                        <div className="flex flex-col items-center gap-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl"
+                        <Button className="w-full h-full flex flex-col"
                              onClick={handleFileClick}>
-                            <CirclePlusIcon className="w-6 h-6 text-gray-700" />
-                            <span className="text-sm font-medium text-gray-800 text-center">Dosya Yükle</span>
-                        </div>
+                            <CirclePlusIcon className="w-6 h-6" />
+                            <Label>Dosya Yükle</Label>
+                        </Button>
                     </div>
 
-                    <div {...getFolderRootProps()} className="cursor-pointer w-full lg:w-auto">
+                    <div {...getFolderRootProps()} className="w-full lg:w-auto">
                         <input {...getFolderInputProps()} id="folderInput" type="file" webkitdirectory="" />
-                        <div className="flex flex-col items-center gap-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 transition rounded-xl"
+                        <Button className="w-full h-full flex flex-col"
                             onClick={handleFolderClick}>
-                            <FolderPlusIcon className="w-6 h-6 text-gray-700" />
-                            <span className="text-sm font-medium text-gray-800 text-center">Klasör Yükle</span>
-                        </div>
+                            <FolderPlusIcon className="w-6 h-6" />
+                            <Label>Klasör Yükle</Label>
+                        </Button>
                     </div>
                 </div>
 
@@ -82,9 +83,9 @@ function UploadCard(): JSX.Element {
                         {uploadedFiles.map((file, index) => (
                             <div
                                 key={`${file.name}-${index}`}
-                                className="bg-gray-100 rounded-lg px-4 py-2 flex justify-between items-center text-sm"
+                                className="bg-muted/90 rounded-md px-4 py-2 flex justify-between items-center text-sm"
                             >
-                                <div className="flex-1 truncate text-gray-800">{file.name}</div>
+                                <div className="flex-1 truncate text-foreground">{file.name}</div>
                                 <Trash
                                     size={16}
                                     className="text-red-500 cursor-pointer hover:text-red-700"
