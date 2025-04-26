@@ -56,30 +56,28 @@ function UploadCard(): JSX.Element {
 
     return (
         <Card className="lg:w-[17.5em] w-full max-h-[30em]">
-            <CardContent className="h-full flex flex-col overflow-y-auto relative space-y-4">
-                <div className="flex justify-center gap-1">
-                    <div {...getFileRootProps()} className="w-full">
-                        <input {...getFileInputProps()} id="fileInput" />
-                        <Button className="w-full h-full flex flex-col"
-                                variant={"outline"}
-                             onClick={handleFileClick}>
-                            <CirclePlusIcon className="w-6 h-6" />
-                            <Label>Dosya Yükle</Label>
-                        </Button>
-                    </div>
-
-                    <div {...getFolderRootProps()} className="w-full">
-                        <input {...getFolderInputProps()} id="folderInput" type="file" webkitdirectory="" />
-                        <Button className="w-full h-full flex flex-col"
-                                variant={"outline"}
-                            onClick={handleFolderClick}>
-                            <FolderPlusIcon className="w-6 h-6" />
-                            <Label>Klasör Yükle</Label>
-                        </Button>
-                    </div>
+            <div className="flex justify-center gap-1 px-6">
+                <div {...getFileRootProps()} className="w-full">
+                    <input {...getFileInputProps()} id="fileInput" />
+                    <Button className="w-full h-full flex flex-col"
+                            variant={"outline"}
+                            onClick={handleFileClick}>
+                        <CirclePlusIcon className="w-6 h-6" />
+                        <Label>Dosya Yükle</Label>
+                    </Button>
                 </div>
 
-
+                <div {...getFolderRootProps()} className="w-full">
+                    <input {...getFolderInputProps()} id="folderInput" type="file" webkitdirectory="" />
+                    <Button className="w-full h-full flex flex-col"
+                            variant={"outline"}
+                            onClick={handleFolderClick}>
+                        <FolderPlusIcon className="w-6 h-6" />
+                        <Label>Klasör Yükle</Label>
+                    </Button>
+                </div>
+            </div>
+            <CardContent className="h-full overflow-y-auto">
                 {uploadedFiles.length > 0 ? (
                     <div className="space-y-2">
                         {uploadedFiles.map((file, index) => (
