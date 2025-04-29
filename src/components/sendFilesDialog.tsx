@@ -35,7 +35,6 @@ type SendFilesDialogProps = {
 }
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
-    const [password, setPassword] = useState("")
     const [selectedUser, setSelectedUser] = useState("")
 
     return (
@@ -46,6 +45,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4 w-full">
+                    <UserSelect value={selectedUser} onChange={setSelectedUser} />
                     <div className={"grid gap-2"}>
                         <Label htmlFor="title">Başlık</Label>
                         <Input id="title" placeholder="Başlık" />
@@ -60,37 +60,23 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen }) => {
                         />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="sm:flex-1 grid gap-2">
-                            <Label htmlFor="password">Şifre (opsiyonel)</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                placeholder="Şifre belirle..."
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                        <div className="sm:flex-1 grid gap-2">
-                            <Label>Süre</Label>
-                            <Select>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Saklanacak süre" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {durations.map((item) => (
-                                            <SelectItem key={item.value} value={item.value}>
-                                                {item.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                    <div className="grid gap-2">
+                        <Label>Süre</Label>
+                        <Select>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Saklanacak süre" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    {durations.map((item) => (
+                                        <SelectItem key={item.value} value={item.value}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                     </div>
-
-                    <UserSelect value={selectedUser} onChange={setSelectedUser} />
                 </div>
 
                 <DialogFooter>

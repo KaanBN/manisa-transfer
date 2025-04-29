@@ -86,15 +86,19 @@ function UploadCard(): JSX.Element {
                                 className="bg-muted/90 rounded-md px-4 py-2 flex justify-between items-center text-sm"
                             >
                                 <div className="flex-1 truncate text-foreground">{file.name}</div>
-                                <Trash
-                                    size={16}
-                                    className="text-red-500 cursor-pointer hover:text-red-700"
+                                <Button
+                                    variant={"ghost"}
                                     onClick={() => {
                                         setUploadedFiles(prev =>
                                             prev.filter((_, i) => i !== index)
                                         );
                                     }}
-                                />
+                                >
+                                    <Trash
+                                        size={16}
+                                        className="text-red-500 hover:text-red-700"
+                                    />
+                                </Button>
                             </div>
                         ))}
                     </div>
