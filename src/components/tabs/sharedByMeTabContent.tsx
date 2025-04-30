@@ -18,66 +18,81 @@ import Spinner from "@/components/spinner.tsx";
 import {format} from "date-fns";
 import {tr} from "date-fns/locale";
 import {ShareModel} from "@/models/shareModel.ts";
-import {downloadFile} from "@/api/file/downloadFile.ts";
-
-const columns: ColumnDef<ShareModel>[] = [
-    {
-        accessorKey: "userName",
-        header: "Gönderilen",
-        cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
-    },
-    {
-        accessorKey: "title",
-        header: "Başlık",
-        cell: ({ row }) => <div>{row.getValue("title")}</div>,
-    },
-    {
-        accessorKey: "uploadTime",
-        header: "Gönderim Zamanı",
-        cell: ({ row }) => {
-            const rawDate = row.getValue("uploadTime") as string;
-            const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
-                locale: tr,
-            });
-            return <div>{formatted}</div>;
-        },
-    },
-    {
-        accessorKey: "status",
-        header: "Durum",
-        cell: ({ row }) =>{
-            const status = row.getValue("status") as string;
-            const statusClass = status === "waiting" ? "text-yellow-500" : status === "downloaded" ? "text-green-500" : "text-red-500";
-            const translatedStatus = status === "waiting" ? "Beklemede" : status === "downloaded" ? "İndirildi" : "İndirilmedi";
-            return <div className={`font-medium ${statusClass}`}>{translatedStatus}</div>;
-        },
-    },
-    {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-            const rowData = row.original;
-
-            const handleDownloadClick = () => {
-                const shareIds = rowData.files.map((f) => f.id);
-
-                if (shareIds.length === 0) return;
-
-                downloadFile(shareIds);
-            };
-
-            return (
-                <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
-                    <Download />
-                </Button>
-            );
-        },
-    }
-]
+import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
+import {ShareFileModel} from "@/models/shareFileModel.ts";
+import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 
 const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const { data, isPending, isError, error } = useListSent();
+    const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
+
+    const [showDialog, setShowDialog] = React.useState(false);
+    const [selectedFiles, setSelectedFiles] = React.useState<ShareFileModel[]>([]);
+
+
+    const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
+        {
+            accessorKey: "userName",
+            header: "Gönderilen",
+            cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
+        },
+        {
+            accessorKey: "title",
+            header: "Başlık",
+            cell: ({ row }) => <div>{row.getValue("title")}</div>,
+        },
+        {
+            accessorKey: "uploadTime",
+            header: "Gönderim Zamanı",
+            cell: ({ row }) => {
+                const rawDate = row.getValue("uploadTime") as string;
+                const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
+                    locale: tr,
+                });
+                return <div>{formatted}</div>;
+            },
+        },
+        {
+            accessorKey: "status",
+            header: "Durum",
+            cell: ({ row }) =>{
+                const status = row.getValue("status");
+                const statusClass = status === 1 ? "text-green-500" : "text-red-500";
+                const translatedStatus = status === 1 ? "İndirildi" : "İndirilmedi";
+                return <div className={`font-medium ${statusClass}`}>{translatedStatus}</div>;
+            },
+        },
+        {
+            id: "actions",
+            header: "",
+            cell: ({ row }) => {
+                const rowData = row.original;
+
+                const handleDownloadClick = () => {
+                    const shareIds = rowData.files.map((f) => f.id);
+
+                    if (shareIds.length === 0) return;
+
+                    if (shareIds.length === 1) {
+                        downloadMutate(shareIds);
+                    } else {
+                        setSelectedFiles(rowData.files);
+                        setShowDialog(true);
+                    }
+                };
+
+                return (
+                    <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
+                        {
+                            downloadPending ? (<Spinner size={3} color={"#ff00ff"} />) : (<Download />)
+                        }
+                    </Button>
+                );
+            },
+        }
+    ], [setSelectedFiles, setShowDialog, downloadMutate]);
+
 
     const table = useReactTable({
         data: data?.data ?? [],
@@ -164,6 +179,12 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                     </TableBody>
                 </Table>
             </div>
+
+            <DownloadFilesDialog
+                fileList={selectedFiles}
+                showFileListModal={showDialog}
+                setShowFileListModal={setShowDialog}
+            />
         </div>
     )
 });

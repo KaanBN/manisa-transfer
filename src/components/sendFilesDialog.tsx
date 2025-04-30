@@ -1,52 +1,32 @@
-import { useState } from "react"
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { UserSelect } from "@/components/userSelect.tsx"
+import {useState} from "react"
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Textarea} from "@/components/ui/textarea"
+import {Button} from "@/components/ui/button"
+import {UserSelect} from "@/components/userSelect.tsx"
 import {useSendFiles} from "@/hooks/useSendFiles.ts";
 import Spinner from "@/components/spinner.tsx";
 import {toast} from "sonner";
 import ShareLinkDialog from "@/components/shareLinkDialog.tsx";
-
-const durations = [
-    { label: "1 Gün", value: "one_day" },
-    { label: "2 Gün", value: "two_days" },
-    { label: "3 Gün", value: "three_days" },
-    { label: "1 Hafta", value: "one_week" },
-    { label: "1 Ay", value: "one_month" },
-    { label: "Süresiz", value: "indefinite" },
-]
+import { Progress } from "./ui/progress"
 
 type SendFilesDialogProps = {
     open: boolean
     setOpen: (open: boolean) => void
     files: File[]
+    setFiles: (files: File[]) => void
 }
 
-const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen, files }) => {
-    const { mutate: sendFiles, isPending, isError, error } = useSendFiles();
+const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, setFiles}) => {
+    const {mutate: sendFiles, isPending, isError, error} = useSendFiles();
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
     const [showLinkModal, setShowLinkModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState("")
     const [title, setTitle] = useState("")
     const [message, setMessage] = useState("")
-    const [duration, setDuration] = useState("")
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -59,18 +39,24 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen, files 
             {
                 title: title,
                 message: message,
-                files: files
+                files: files,
+                onProgress: (e) => setUploadProgress(e),
             },
             {
                 onSuccess: (resData) => {
-                    setOpen(false);
-
                     if (resData.data?.downloadLink) {
                         setDownloadLink(resData.data.downloadLink);
                         setShowLinkModal(true);
                     } else {
                         toast.success(resData.message);
                     }
+
+                    setTitle("");
+                    setMessage("");
+                    setSelectedUser("");
+                    setUploadProgress(0);
+                    setOpen(false);
+                    setFiles([]);
                 }
 
             }
@@ -86,33 +72,51 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen, files 
                         <DialogTitle>Dosya Gönder</DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit} className="grid gap-4 py-4 w-full">
-                        <UserSelect value={selectedUser} onChange={setSelectedUser} />
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="title">Başlık</Label>
-                            <Input
-                                id="title"
-                                placeholder="Başlık"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                            />
+                    {isPending && (
+                        <div className="w-full py-2">
+                            <Label>Yükleme Durumu</Label>
+                            <Progress value={uploadProgress} className="mt-1 h-3" />
+                            <p className="text-sm mt-1 text-muted-foreground">{uploadProgress}%</p>
                         </div>
+                    )}
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="message">Mesaj</Label>
-                            <Textarea
-                                id="message"
-                                placeholder="Mesajınızı yazın..."
-                                className="min-h-[100px] max-h-[150px] resize-y break-all"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                required
-                            />
-                        </div>
+                    {
+                        uploadProgress == 100 && (
+                            <div className="w-full py-2">
+                                <Label>İşleniyor</Label>
+                            </div>
+                        )
+                    }
 
-                        {/*
+                    {
+                        !isPending && (
+                            <form onSubmit={handleSubmit} className="grid gap-4 py-4 w-full">
+                                <UserSelect value={selectedUser} onChange={setSelectedUser}/>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="title">Başlık</Label>
+                                    <Input
+                                        id="title"
+                                        placeholder="Başlık"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="message">Mesaj</Label>
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Mesajınızı yazın..."
+                                        className="min-h-[100px] max-h-[150px] resize-y break-all"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {/*
                         <div className="grid gap-2">
                             <Label>Süre</Label>
                             <Select value={duration} onValueChange={setDuration}>
@@ -131,17 +135,19 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({ open, setOpen, files 
                             </Select>
                         </div>*/}
 
-                        <DialogFooter>
-                            {isError && (
-                                <p className="mt-2 text-sm text-red-500">
-                                    {(error as any)?.response?.data?.message || "Giriş sırasında bir hata oluştu."}
-                                </p>
-                            )}
-                            <Button type="submit" disabled={isPending}>
-                                {isPending ? <Spinner /> : "Gönder"}
-                            </Button>
-                        </DialogFooter>
-                    </form>
+                                <DialogFooter>
+                                    {isError && (
+                                        <p className="mt-2 text-sm text-red-500">
+                                            {(error as any)?.response?.data?.message || "Giriş sırasında bir hata oluştu."}
+                                        </p>
+                                    )}
+                                    <Button type="submit" disabled={isPending}>
+                                        {isPending ? <Spinner/> : "Gönder"}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        )
+                    }
                 </DialogContent>
             </Dialog>
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL
+    baseURL: "http://localhost:5138/api"
 });
 
 apiClient.interceptors.request.use((config) => {
@@ -17,7 +17,8 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-
+            localStorage.removeItem("accessToken");
+            window.dispatchEvent(new Event("storage"));
         }
         return Promise.reject(error);
     }

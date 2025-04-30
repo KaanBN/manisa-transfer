@@ -5,9 +5,10 @@ type SendFilesPayload = {
     message: string;
     receiverId?: number;
     files: File[];
+    onProgress: (progress: number) => void;
 };
 
-export const sendFiles = async ({ title, message, receiverId, files }: SendFilesPayload) => {
+export const sendFiles = async ({ title, message, receiverId, files, onProgress }: SendFilesPayload) => {
     const formData = new FormData();
 
     formData.append("title", title);
@@ -24,6 +25,12 @@ export const sendFiles = async ({ title, message, receiverId, files }: SendFiles
         headers: {
             "Content-Type": "multipart/form-data",
         },
+        onUploadProgress: (event) => {
+            if (onProgress && event.total) {
+                const percent = Math.round((event.loaded * 100) / event.total);
+                onProgress(percent);
+            }
+        }
     });
 
     return res.data;

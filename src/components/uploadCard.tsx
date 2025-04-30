@@ -104,6 +104,7 @@ function UploadCard(): JSX.Element {
                     open={openSendFilesDialog}
                     setOpen={setOpenSendFilesDialog}
                     files={selectedFiles}
+                    setFiles={setSelectedFiles}
                 />
             </CardFooter>
         </Card>
