@@ -15,77 +15,16 @@ import {forwardRef, useImperativeHandle} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
-import {IncomingFile} from "@/types/incomingFile.ts";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
+import {SharedFile} from "@/models/sharedFileModel.ts";
+import {useListReceived} from "@/hooks/useListReceived.ts";
+import Spinner from "@/components/spinner.tsx";
 
-const data: IncomingFile[] = [
-        {
-            "from": "İbrahim Şimşek",
-            "title": "2025 Yılı Stratejik Plan Taslağı",
-            "date": "2024-12-24T01:25:00.000-03:00",
-            "status": "not downloaded"
-        },
-        {
-            "from": "Gamze Polat",
-            "title": "İlçe Genelinde Yeşil Alan Artırımı Raporu",
-            "date": "2019-02-08T01:29:12.000-03:00",
-            "status": "not downloaded"
-        },
-        {
-            "from": "Hakan Koşar",
-            "title": "Sosyal Hizmetler Müdürlüğü 2015 Yılı Değerlendirme",
-            "date": "2015-02-27T05:40:34.000-02:00",
-            "status": "downloaded"
-        },
-        {
-            "from": "Merve Tunç",
-            "title": "İç Kontrol Süreçleri Geliştirme Planı",
-            "date": "2015-09-11T01:23:00.000-03:00",
-            "status": "downloaded"
-        },
-        {
-            "from": "Kenan Sarı",
-            "title": "2021 Yılı Afet Yönetimi Hazırlık Programı",
-            "date": "2021-08-17T05:58:29.000-03:00",
-            "status": "not downloaded"
-        },
-        {
-            "from": "Seda Bayraktar",
-            "title": "İlçe Genelinde Atık Yönetimi Uygulamaları",
-            "date": "2019-06-02T03:25:50.000-03:00",
-            "status": "not downloaded"
-        },
-        {
-            "from": "Okan Erdem",
-            "title": "Zabıta Müdürlüğü 2020 Yılı Faaliyet Raporu",
-            "date": "2020-08-03T03:24:01.000-03:00",
-            "status": "downloaded"
-        },
-        {
-            "from": "Aylin Keskin",
-            "title": "Belediye Bilgi İşlem Altyapı Güncellemesi",
-            "date": "2021-06-16T07:26:52.000-03:00",
-            "status": "downloaded"
-        },
-        {
-            "from": "Yusuf Güneş",
-            "title": "Emlak ve İstimlak Müdürlüğü İhale Dosyası",
-            "date": "2023-01-24T04:17:09.000-03:00",
-            "status": "not downloaded"
-        },
-        {
-            "from": "Esra Kılıç",
-            "title": "2016 Yılı İçin Su ve Kanalizasyon Proje Planları",
-            "date": "2016-04-30T11:20:41.000-03:00",
-            "status": "downloaded"
-        }
-    ];
-
-const columns: ColumnDef<IncomingFile>[] = [
+const columns: ColumnDef<SharedFile>[] = [
     {
-        accessorKey: "from",
+        accessorKey: "userName",
         header: "Gönderen",
-        cell: ({ row }) => <div className="font-medium">{row.getValue("from")}</div>,
+        cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
     },
     {
         accessorKey: "title",
@@ -93,10 +32,10 @@ const columns: ColumnDef<IncomingFile>[] = [
         cell: ({ row }) => <div>{row.getValue("title")}</div>,
     },
     {
-        accessorKey: "date",
+        accessorKey: "uploadTimes",
         header: "Gönderim Zamanı",
         cell: ({ row }) => {
-            const rawDate = row.getValue("date") as string;
+            const rawDate = row.getValue("uploadTime") as string;
             const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
                 locale: tr,
             });
@@ -134,9 +73,10 @@ const columns: ColumnDef<IncomingFile>[] = [
 
 const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const { data, isPending, isError, error } = useListReceived();
 
     const table = useReactTable({
-        data,
+        data: data?.data ?? [],
         columns,
         filterFns: {},
         state: {
@@ -155,14 +95,31 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
         getCanPreviousPage: () => table.getCanPreviousPage(),
     }));
 
+    if (isPending) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Spinner color={"#ff00ff"}/>
+                <span className={"ml-2"}>Yükleniyor...</span>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="text-center text-red-500 mt-4">
+                Bir hata oluştu: {error?.message}
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full flex flex-col">
             <div className="py-4">
                 <Input
                     placeholder="Gönderene göre filtrele..."
-                    value={(table.getColumn("from")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("userName")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("from")?.setFilterValue(event.target.value)
+                        table.getColumn("userName")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
@@ -204,7 +161,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 </Table>
             </div>
         </div>
-    )
+    );
 });
 
 export default SharedWithMeTabContent;

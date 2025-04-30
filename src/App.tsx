@@ -6,10 +6,12 @@ import UploadCard from "@/components/uploadCard.tsx";
 import UserFileTableCard from "@/components/userFileTableCard.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import {useTheme} from "@/components/themeProvider.tsx";
+import {useAuth} from "@/hooks/useAuth.ts";
 
 function App(): JSX.Element {
 
     const { theme } = useTheme()
+    const { isAuthenticated } = useAuth()
 
     return (
         <div
@@ -26,9 +28,13 @@ function App(): JSX.Element {
                     <UploadCard />
                 </div>
 
-                <div className="flex-1 min-w-0 lg:self-center">
-                    <UserFileTableCard />
-                </div>
+                {
+                    isAuthenticated && (
+                        <div className="flex-1 min-w-0 lg:self-center">
+                            <UserFileTableCard />
+                        </div>
+                    )
+                }
             </main>
 
             <footer className="text-center text-xs text-white py-4">

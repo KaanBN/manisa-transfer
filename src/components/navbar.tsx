@@ -4,12 +4,17 @@ import {MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger} from "./ui/men
 import { useState } from "react";
 import LoginDrawer from "@/components/loginDrawer.tsx";
 import {ThemeToggle} from "@/components/themeToggle.tsx";
+import {useAuth} from "@/hooks/useAuth.ts";
 
 const Navbar: React.FC = () => {
-    // const user = useUser();
-    const user = false;
+    const { user } = useAuth();
 
     const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
+
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        window.dispatchEvent(new Event("storage"));
+    }
 
     return (
         <nav>
@@ -18,7 +23,7 @@ const Navbar: React.FC = () => {
                     <Menubar>
                         <MenubarMenu>
                             <MenubarTrigger className="bg-accent text-accent-foreground">
-                                Kullanıcı Adı
+                                {user.fullName}
                             </MenubarTrigger>
                             <MenubarContent align={"end"}>
                                 <MenubarItem
@@ -26,7 +31,7 @@ const Navbar: React.FC = () => {
                                         "text-red-400 focus:bg-red-400 focus:text-white"
                                     }
                                     onClick={() => {
-                                        console.log("clicked");
+                                        handleLogout()
                                     }}
                                 >
                                     Çıkış Yap

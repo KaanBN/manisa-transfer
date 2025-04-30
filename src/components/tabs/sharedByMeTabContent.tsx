@@ -9,82 +9,21 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useImperativeHandle} from "react";
-import { SharedFile } from "@/types/sharedFile";
+import {forwardRef, useEffect, useImperativeHandle} from "react";
 import {Button} from "@/components/ui/button.tsx";
-import {format} from "date-fns";
-import {tr} from "date-fns/locale";
 import {Download} from "lucide-react";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
-
-const data: SharedFile[] = [
-    {
-        "to": "Ahmet Yılmaz",
-        "title": "2022 Yılı Mali Hizmetler Müdürlüğü Faaliyet Raporu",
-        "date": "2022-04-10T02:21:48-03:00",
-        "status": "not downloaded"
-    },
-    {
-        "to": "Ayşe Demir",
-        "title": "Şehir İmar Planı Revizyonu Hakkında Bilgilendirme",
-        "date": "2021-05-29T06:35:17-03:00",
-        "status": "not downloaded"
-    },
-    {
-        "to": "Mehmet Kaya",
-        "title": "Sosyal Yardım Başvuruları 2020 Yılı Değerlendirme Raporu",
-        "date": "2020-02-19T01:01:34-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Fatma Şahin",
-        "title": "Park ve Bahçeler Müdürlüğü Ağaçlandırma Projesi Sonuçları",
-        "date": "2023-08-10T11:57:37-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Emre Çelik",
-        "title": "Çevre Temizlik Çalışmaları Yıllık Raporu",
-        "date": "2023-06-06T03:37:00-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Zeynep Aydın",
-        "title": "Yaz Dönemi Kültür ve Sanat Etkinlik Programı",
-        "date": "2022-11-28T01:27:07-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Burak Koç",
-        "title": "İlçe Geneli Asfalt Yenileme Çalışmaları Planı",
-        "date": "2020-12-25T02:32:09-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Elif Özkan",
-        "title": "Yeni Hizmete Açılan Sosyal Tesisler Listesi",
-        "date": "2022-03-16T12:22:52-03:00",
-        "status": "not downloaded"
-    },
-    {
-        "to": "Mustafa Arslan",
-        "title": "2024 Kış Mevsimi Karla Mücadele Eylem Planı",
-        "date": "2024-11-06T07:45:54-03:00",
-        "status": "downloaded"
-    },
-    {
-        "to": "Selin Yıldız",
-        "title": "2022 Yılı İç Denetim Faaliyet Raporu",
-        "date": "2022-07-12T04:01:36-03:00",
-        "status": "not downloaded"
-    }
-];
+import {SharedFile} from "@/models/sharedFileModel.ts";
+import {useListSent} from "@/hooks/useListSent.ts";
+import Spinner from "@/components/spinner.tsx";
+import {format} from "date-fns";
+import {tr} from "date-fns/locale";
 
 const columns: ColumnDef<SharedFile>[] = [
     {
-        accessorKey: "to",
+        accessorKey: "userName",
         header: "Gönderilen",
-        cell: ({ row }) => <div className="font-medium">{row.getValue("to")}</div>,
+        cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
     },
     {
         accessorKey: "title",
@@ -92,10 +31,10 @@ const columns: ColumnDef<SharedFile>[] = [
         cell: ({ row }) => <div>{row.getValue("title")}</div>,
     },
     {
-        accessorKey: "date",
+        accessorKey: "uploadTime",
         header: "Gönderim Zamanı",
         cell: ({ row }) => {
-            const rawDate = row.getValue("date") as string;
+            const rawDate = row.getValue("uploadTime") as string;
             const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
                 locale: tr,
             });
@@ -133,9 +72,14 @@ const columns: ColumnDef<SharedFile>[] = [
 
 const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const { data, isPending, isError, error } = useListSent();
+
+    useEffect(() => {
+        console.log(data)
+    }, [data]);
 
     const table = useReactTable({
-        data,
+        data: data?.data ?? [],
         columns,
         filterFns: {},
         state: {
@@ -154,14 +98,31 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
         getCanPreviousPage: () => table.getCanPreviousPage(),
     }));
 
+    if (isPending) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <Spinner color={"#ff00ff"}/>
+                <span className={"ml-2"}>Yükleniyor...</span>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="text-center text-red-500 mt-4">
+                Bir hata oluştu: {error?.message}
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full flex flex-col">
             <div className="py-4">
                 <Input
                     placeholder="Gönderilene göre filtrele..."
-                    value={(table.getColumn("to")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("userName")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("to")?.setFilterValue(event.target.value)
+                        table.getColumn("userName")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />

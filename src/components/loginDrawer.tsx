@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/drawer.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
+import {useLogin} from "@/hooks/useLogin.ts";
+import Spinner from "@/components/spinner.tsx";
+import {useState} from "react";
 
 type LoginDrawerProps = {
     open: boolean;
@@ -16,6 +19,23 @@ type LoginDrawerProps = {
 }
 
 const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
+    const { mutate: login, isPending, isError, error } = useLogin();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!username || !password) return;
+        login(
+            { username, password },
+            {
+                onSuccess: () => {
+                    setOpen(false);
+                }
+            }
+        );
+    };
+
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerContent>
@@ -24,29 +44,41 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
                         <DrawerTitle>Giriş Yap</DrawerTitle>
                         <DrawerDescription>Hesabınıza giriş yapın.</DrawerDescription>
                     </DrawerHeader>
-                    <div className="p-4">
-
-                        <Input
-                            type="email"
-                            placeholder="Email"
-                            className="mb-4"
-                        />
-
-                        <Input
-                            type="password"
-                            placeholder="Şifre"
-                        />
-                    </div>
-                    <DrawerFooter>
-                        <Button onClick={() => console.log("Login logic")}>Giriş Yap</Button>
-                        <DrawerClose asChild>
-                            <Button variant="outline">İptal</Button>
-                        </DrawerClose>
-                    </DrawerFooter>
+                    <form onSubmit={handleLogin}>
+                        <div className="p-4">
+                            <Input
+                                placeholder="Kullanıcı Adı"
+                                className="mb-4"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                            <Input
+                                type="password"
+                                placeholder="Şifre"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            {isError && (
+                                <p className="mt-2 text-sm text-red-500">
+                                    {(error as any)?.response?.data?.message || "Giriş sırasında bir hata oluştu."}
+                                </p>
+                            )}
+                        </div>
+                        <DrawerFooter>
+                            <Button type="submit" disabled={isPending}>
+                                {isPending ? <Spinner /> : "Giriş Yap"}
+                            </Button>
+                            <DrawerClose asChild>
+                                <Button variant="outline" type="button">İptal</Button>
+                            </DrawerClose>
+                        </DrawerFooter>
+                    </form>
                 </div>
             </DrawerContent>
         </Drawer>
     );
-}
+};
 
 export default LoginDrawer;

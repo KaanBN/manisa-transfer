@@ -4,54 +4,44 @@ import {UploadedFileModel} from "@/models/uploadedFileModel.ts";
 import {Card, CardContent, CardFooter} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import { toast } from "sonner"
-import {CirclePlusIcon, FolderPlusIcon, Trash} from "lucide-react";
+import {CirclePlusIcon, Trash} from "lucide-react";
 import SendFilesDialog from "@/components/sendFilesDialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
 
 function UploadCard(): JSX.Element {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFileModel[]>([]);
-    const [openSendFilesDialog, setOpenSendFilesDialog] = useState(false)
+    const [openSendFilesDialog, setOpenSendFilesDialog] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
     const handleFilesUploaded = (newFiles: UploadedFileModel[]) => {
         setUploadedFiles(prev => [...prev, ...newFiles]);
     };
 
     const onDropFiles = useCallback((acceptedFiles: File[]) => {
-        const mappedFiles: UploadedFileModel[] = acceptedFiles.map(file => ({
-            name: file.name,
-            size: file.size,
-            oneTimeDownload: false,
-        }));
-        handleFilesUploaded(mappedFiles);
-    }, [handleFilesUploaded]);
+        setSelectedFiles(prev => [...prev, ...acceptedFiles]);
 
-    const onDropFolders = useCallback((acceptedFiles: File[]) => {
         const mappedFiles: UploadedFileModel[] = acceptedFiles.map(file => ({
             name: file.name,
             size: file.size,
             oneTimeDownload: false,
         }));
         handleFilesUploaded(mappedFiles);
-    }, [handleFilesUploaded]);
+    }, []);
+
 
     const { getRootProps: getFileRootProps, getInputProps: getFileInputProps } = useDropzone({
         onDrop: onDropFiles,
         noClick: true,
         multiple: true,
-    });
-
-    const { getRootProps: getFolderRootProps, getInputProps: getFolderInputProps } = useDropzone({
-        onDrop: onDropFolders,
-        noClick: true,
-        multiple: true,
+        accept: {
+            'application/vnd.rar': ['.rar'],
+            'application/zip': ['.zip'],
+            'application/x-zip-compressed': ['.zip'],
+        }
     });
 
     const handleFileClick = () => {
         document.getElementById("fileInput")?.click();
-    };
-
-    const handleFolderClick = () => {
-        document.getElementById("folderInput")?.click();
     };
 
     return (
@@ -64,16 +54,6 @@ function UploadCard(): JSX.Element {
                             onClick={handleFileClick}>
                         <CirclePlusIcon className="w-6 h-6" />
                         <Label>Dosya Yükle</Label>
-                    </Button>
-                </div>
-
-                <div {...getFolderRootProps()} className="w-full">
-                    <input {...getFolderInputProps()} id="folderInput" type="file" webkitdirectory="" />
-                    <Button className="w-full h-full flex flex-col"
-                            variant={"outline"}
-                            onClick={handleFolderClick}>
-                        <FolderPlusIcon className="w-6 h-6" />
-                        <Label>Klasör Yükle</Label>
                     </Button>
                 </div>
             </div>
@@ -121,7 +101,11 @@ function UploadCard(): JSX.Element {
                     }}
                     className={"w-full"}>Gönder</Button>
 
-                <SendFilesDialog open={openSendFilesDialog} setOpen={setOpenSendFilesDialog} />
+                <SendFilesDialog
+                    open={openSendFilesDialog}
+                    setOpen={setOpenSendFilesDialog}
+                    files={selectedFiles}
+                />
             </CardFooter>
         </Card>
 
