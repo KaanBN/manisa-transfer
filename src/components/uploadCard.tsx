@@ -23,7 +23,6 @@ function UploadCard(): JSX.Element {
         const mappedFiles: UploadedFileModel[] = acceptedFiles.map(file => ({
             name: file.name,
             size: file.size,
-            oneTimeDownload: false,
         }));
         handleFilesUploaded(mappedFiles);
     }, []);

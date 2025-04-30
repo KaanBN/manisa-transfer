@@ -1,10 +1,10 @@
 import {useQuery} from "@tanstack/react-query";
-import {SharedFileResponse} from "@/models/sharedFileResponse.ts";
 import { AxiosError } from "axios";
 import {fetchSent} from "@/api/file/fetchSent.ts";
+import {SentFilesListResponse} from "@/models/response/sentFilesListResponse.ts";
 
 export const useListSent = () => {
-    return useQuery<SharedFileResponse, AxiosError>({
+    return useQuery<SentFilesListResponse, AxiosError>({
         queryKey: ['sentFiles'],
         queryFn: fetchSent,
     });

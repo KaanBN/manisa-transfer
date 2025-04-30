@@ -42,11 +42,11 @@ const Navbar: React.FC = () => {
                 ) : (
                     <>
                         <Button className={"mr-2"} onClick={() => setLoginDrawerOpen(true)}>Giriş Yap</Button>
-                        <ThemeToggle />
 
                         <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen} />
                     </>
                 )}
+                <ThemeToggle />
             </div>
         </nav>
     );

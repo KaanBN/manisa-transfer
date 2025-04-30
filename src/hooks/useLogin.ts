@@ -6,7 +6,6 @@ export const useLogin = () => {
         mutationFn: login,
         onSuccess: (data) => {
             const token = data.data.token;
-            console.log("Token before saving: ", token);
 
             localStorage.setItem("accessToken", token);
             window.dispatchEvent(new Event("tokenChanged"));

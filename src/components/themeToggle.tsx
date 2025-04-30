@@ -9,7 +9,7 @@ export function ThemeToggle() {
 
     return (
         <Button
-            className={"h-9 w-9 p-0 transition-all bg-background hover:bg-background text-foreground"}
+            className={"h-9 w-9 p-0 transition-all bg-background hover:bg-background text-foreground ml-2"}
             size="icon"
             onClick={() => {
                 if (theme === "dark") {

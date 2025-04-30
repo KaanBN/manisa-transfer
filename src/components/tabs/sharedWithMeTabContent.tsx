@@ -16,11 +16,12 @@ import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
-import {SharedFile} from "@/models/sharedFileModel.ts";
 import {useListReceived} from "@/hooks/useListReceived.ts";
 import Spinner from "@/components/spinner.tsx";
+import {ShareModel} from "@/models/shareModel.ts";
+import {downloadFile} from "@/api/file/downloadFile.ts";
 
-const columns: ColumnDef<SharedFile>[] = [
+const columns: ColumnDef<ShareModel>[] = [
     {
         accessorKey: "userName",
         header: "Gönderen",
@@ -32,7 +33,7 @@ const columns: ColumnDef<SharedFile>[] = [
         cell: ({ row }) => <div>{row.getValue("title")}</div>,
     },
     {
-        accessorKey: "uploadTimes",
+        accessorKey: "uploadTime",
         header: "Gönderim Zamanı",
         cell: ({ row }) => {
             const rawDate = row.getValue("uploadTime") as string;
@@ -46,9 +47,9 @@ const columns: ColumnDef<SharedFile>[] = [
         accessorKey: "status",
         header: "Durum",
         cell: ({ row }) =>{
-            const status = row.getValue("status") as string;
-            const statusClass = status === "waiting" ? "text-yellow-500" : status === "downloaded" ? "text-green-500" : "text-red-500";
-            const translatedStatus = status === "waiting" ? "Beklemede" : status === "downloaded" ? "İndirildi" : "İndirilmedi";
+            const status = row.getValue("status");
+            const statusClass = status == 1 ? "text-green-500" : "text-red-500";
+            const translatedStatus = status == 1  ? "İndirildi" : "İndirilmedi";
             return <div className={`font-medium ${statusClass}`}>{translatedStatus}</div>;
         },
     },
@@ -58,17 +59,22 @@ const columns: ColumnDef<SharedFile>[] = [
         cell: ({ row }) => {
             const rowData = row.original;
 
-            const handleDownload = () => {
-                console.log(`"${rowData.title}" adlı dosya indiriliyor...`);
+            const handleDownloadClick = () => {
+                const shareIds = rowData.files.map((f) => f.id);
+
+                if (shareIds.length === 0) return;
+
+                downloadFile(shareIds);
             };
 
             return (
-                <Button variant={"ghost"} size="sm" onClick={handleDownload}>
+                <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
                     <Download />
                 </Button>
             );
         },
     }
+
 ]
 
 const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
@@ -76,7 +82,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const { data, isPending, isError, error } = useListReceived();
 
     const table = useReactTable({
-        data: data?.data ?? [],
+        data: data?.data || [],
         columns,
         filterFns: {},
         state: {

@@ -9,17 +9,18 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useEffect, useImperativeHandle} from "react";
+import {forwardRef, useImperativeHandle} from "react";
 import {Button} from "@/components/ui/button.tsx";
 import {Download} from "lucide-react";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
-import {SharedFile} from "@/models/sharedFileModel.ts";
 import {useListSent} from "@/hooks/useListSent.ts";
 import Spinner from "@/components/spinner.tsx";
 import {format} from "date-fns";
 import {tr} from "date-fns/locale";
+import {ShareModel} from "@/models/shareModel.ts";
+import {downloadFile} from "@/api/file/downloadFile.ts";
 
-const columns: ColumnDef<SharedFile>[] = [
+const columns: ColumnDef<ShareModel>[] = [
     {
         accessorKey: "userName",
         header: "Gönderilen",
@@ -57,12 +58,16 @@ const columns: ColumnDef<SharedFile>[] = [
         cell: ({ row }) => {
             const rowData = row.original;
 
-            const handleDownload = () => {
-                console.log(`"${rowData.title}" adlı dosya indiriliyor...`);
+            const handleDownloadClick = () => {
+                const shareIds = rowData.files.map((f) => f.id);
+
+                if (shareIds.length === 0) return;
+
+                downloadFile(shareIds);
             };
 
             return (
-                <Button variant={"ghost"} size="sm" onClick={handleDownload}>
+                <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
                     <Download />
                 </Button>
             );
@@ -73,10 +78,6 @@ const columns: ColumnDef<SharedFile>[] = [
 const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const { data, isPending, isError, error } = useListSent();
-
-    useEffect(() => {
-        console.log(data)
-    }, [data]);
 
     const table = useReactTable({
         data: data?.data ?? [],
