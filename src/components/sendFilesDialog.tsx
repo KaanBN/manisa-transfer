@@ -10,6 +10,7 @@ import Spinner from "@/components/spinner.tsx";
 import {toast} from "sonner";
 import ShareLinkDialog from "@/components/shareLinkDialog.tsx";
 import { Progress } from "./ui/progress"
+import {UserModel} from "@/models/userModel.ts";
 
 type SendFilesDialogProps = {
     open: boolean
@@ -22,7 +23,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
     const {mutate: sendFiles, isPending, isError, error} = useSendFiles();
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
     const [showLinkModal, setShowLinkModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState("")
+    const [selectedUser, setSelectedUser] = useState<UserModel | undefined>();
     const [title, setTitle] = useState("")
     const [message, setMessage] = useState("")
     const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -40,6 +41,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                 title: title,
                 message: message,
                 files: files,
+                receiverId: selectedUser?.id,
                 onProgress: (e) => setUploadProgress(e),
             },
             {
@@ -53,7 +55,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
 
                     setTitle("");
                     setMessage("");
-                    setSelectedUser("");
+                    setSelectedUser(undefined);
                     setUploadProgress(0);
                     setOpen(false);
                     setFiles([]);
@@ -81,7 +83,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                     )}
 
                     {
-                        uploadProgress == 100 && (
+                        uploadProgress == 100 && isPending && (
                             <div className="w-full py-2">
                                 <Label>İşleniyor</Label>
                             </div>

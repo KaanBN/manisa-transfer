@@ -1,5 +1,4 @@
-export type User = {
+export type UserModel = {
     id: number;
-    username: string;
     displayName: string;
 };
