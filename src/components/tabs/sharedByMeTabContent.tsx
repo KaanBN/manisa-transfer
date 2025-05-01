@@ -58,8 +58,24 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
             header: "Durum",
             cell: ({ row }) =>{
                 const status = row.getValue("status");
-                const statusClass = status === 1 ? "text-green-500" : "text-red-500";
-                const translatedStatus = status === 1 ? "İndirildi" : "İndirilmedi";
+
+                let translatedStatus;
+                let statusClass;
+
+                switch (status) {
+                    case 2:
+                        translatedStatus = "Kısmi";
+                        statusClass = "text-yellow-500";
+                        break;
+                    case 1:
+                        translatedStatus = "İndirildi";
+                        statusClass = "text-green-500";
+                        break;
+                    default:
+                        translatedStatus = "İndirilmedi";
+                        statusClass = "text-red-500";
+                }
+
                 return <div className={`font-medium ${statusClass}`}>{translatedStatus}</div>;
             },
         },
