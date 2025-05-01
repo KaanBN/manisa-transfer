@@ -10,6 +10,8 @@ import {Label} from "@/components/ui/label.tsx";
 import {useEffect, useState} from "react";
 import {ShareFileModel} from "@/models/shareFileModel.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
+import {Progress} from "@/components/ui/progress.tsx";
 
 type DownloadFilesDialogProps = {
     showFileListModal: boolean;
@@ -23,6 +25,8 @@ const DownloadFilesDialog = ({
                                  setShowFileListModal
                              }: DownloadFilesDialogProps) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [downloadProgress, setDownloadProgress] = useState<number>(0);
+    const { mutate: downloadMutate, isPending: downloadPending, isError } = useDownloadFile();
 
     useEffect(() => {
         if (!showFileListModal)
@@ -50,9 +54,10 @@ const DownloadFilesDialog = ({
     };
 
     const handleDownload = () => {
-        console.log("Selected file IDs:", selectedIds);
-
-        setShowFileListModal(false);
+        downloadMutate({
+            shareFileIdList: selectedIds,
+            onDownloadProgress: (e) => setDownloadProgress(e),
+        });
     };
 
     return (
@@ -82,8 +87,22 @@ const DownloadFilesDialog = ({
                         </div>
                     ))}
                 </div>
-                <DialogFooter>
-                    <Button onClick={handleDownload} disabled={selectedIds.length === 0}>
+                <DialogFooter className={"flex-col sm:flex-col"}>
+                    {downloadPending && (
+                        <div className="w-full mt-4">
+                            <div className="text-sm mb-1">İndirme: %{downloadProgress}</div>
+                            <Progress value={downloadProgress} />
+                        </div>
+                    )}
+                    {isError && (
+                        <div className="w-full mt-4">
+                            <div className="text-sm mb-1">error</div>
+                        </div>
+                    )}
+                    <Button
+                        onClick={handleDownload}
+                        disabled={selectedIds.length === 0 || downloadPending}
+                    >
                         İndir
                     </Button>
                 </DialogFooter>

@@ -11,7 +11,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useImperativeHandle} from "react";
+import {forwardRef, useImperativeHandle, useState} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
@@ -22,14 +22,16 @@ import {ShareModel} from "@/models/shareModel.ts";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
+import {Label} from "@/components/ui/label.tsx";
 
 const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const { data, isPending, isError, error } = useListReceived();
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [showDialog, setShowDialog] = React.useState(false);
     const [selectedFiles, setSelectedFiles] = React.useState<ShareFileModel[]>([]);
+    const [downloadProgress, setDownloadProgress] = useState<number>(0);
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
@@ -86,12 +88,15 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 const rowData = row.original;
 
                 const handleDownloadClick = () => {
-                    const shareIds = rowData.files.map((f) => f.id);
+                    const shareFileIds = rowData.files.map((f) => f.id);
 
-                    if (shareIds.length === 0) return;
+                    if (shareFileIds.length === 0) return;
 
-                    if (shareIds.length === 1) {
-                        downloadMutate(shareIds);
+                    if (shareFileIds.length === 1) {
+                        downloadMutate({
+                            shareFileIdList: shareFileIds,
+                            onDownloadProgress: setDownloadProgress
+                        });
                     } else {
                         setSelectedFiles(rowData.files);
                         setShowDialog(true);
@@ -101,7 +106,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 return (
                     <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
                         {
-                            downloadPending ? (<Spinner size={3} color={"#ff00ff"} />) : (<Download />)
+                            downloadPending ? (<Label>{downloadProgress}%</Label>) : (<Download />)
                         }
                     </Button>
                 );

@@ -9,7 +9,7 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useImperativeHandle} from "react";
+import {forwardRef, useImperativeHandle, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
 import {Download} from "lucide-react";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
@@ -21,6 +21,7 @@ import {ShareModel} from "@/models/shareModel.ts";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
+import {Label} from "@/components/ui/label.tsx";
 
 const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -29,6 +30,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
 
     const [showDialog, setShowDialog] = React.useState(false);
     const [selectedFiles, setSelectedFiles] = React.useState<ShareFileModel[]>([]);
+    const [downloadProgress, setDownloadProgress] = useState<number>(0);
 
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
@@ -91,7 +93,10 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                     if (shareIds.length === 0) return;
 
                     if (shareIds.length === 1) {
-                        downloadMutate(shareIds);
+                        downloadMutate({
+                            shareFileIdList: shareIds,
+                            onDownloadProgress: setDownloadProgress
+                        });
                     } else {
                         setSelectedFiles(rowData.files);
                         setShowDialog(true);
@@ -101,14 +106,13 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 return (
                     <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
                         {
-                            downloadPending ? (<Spinner size={3} color={"#ff00ff"} />) : (<Download />)
+                            downloadPending ? (<Label>{downloadProgress}%</Label>) : (<Download />)
                         }
                     </Button>
                 );
             },
         }
     ], [setSelectedFiles, setShowDialog, downloadMutate]);
-
 
     const table = useReactTable({
         data: data?.data ?? [],

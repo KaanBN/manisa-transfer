@@ -8,4 +8,5 @@ export type ShareModel = {
     uploadTime: string;
     expireTime: string | null;
     files: ShareFileModel[];
+    status: number;
 };

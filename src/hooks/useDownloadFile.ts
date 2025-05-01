@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { downloadFile } from "@/api/file/downloadFile";
+import { downloadFiles } from "@/api/file/downloadFiles";
 
-export const useDownloadFile = () => {
-    return useMutation<void, AxiosError, string[]>({
-        mutationFn: downloadFile,
+export const useDownloadFile = (onSuccess?: () => void) => {
+    return useMutation({
+        mutationFn: downloadFiles,
+        onSuccess: () => {
+            if (onSuccess) onSuccess();
+        },
     });
 };
