@@ -56,6 +56,39 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
             },
         },
         {
+            accessorKey: "expireTime",
+            header: "Kalan Zaman",
+            cell: ({ row }) => {
+                const rawDate = row.getValue("expireTime") as string;
+                const targetTime = new Date(rawDate).getTime();
+                const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
+
+                React.useEffect(() => {
+                    const interval = setInterval(() => {
+                        setTimeLeft(targetTime - Date.now());
+                    }, 1000);
+
+                    return () => clearInterval(interval);
+                }, [targetTime]);
+
+                if (timeLeft <= 0) return <span>Süre doldu</span>;
+
+                const seconds = Math.floor((timeLeft / 1000) % 60);
+                const minutes = Math.floor((timeLeft / 1000 / 60) % 60);
+                const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+
+                return (
+                    <span>
+                        {days > 0 && `${days}g `}
+                        {hours.toString().padStart(2, "0")}:
+                        {minutes.toString().padStart(2, "0")}:
+                        {seconds.toString().padStart(2, "0")}
+                    </span>
+                );
+            },
+        },
+        {
             accessorKey: "status",
             header: "Durum",
             cell: ({ row }) =>{
@@ -88,13 +121,13 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 const rowData = row.original;
 
                 const handleDownloadClick = () => {
-                    const shareIds = rowData.files.map((f) => f.id);
+                    const shareFileIds = rowData.files.map((f) => f.id);
 
-                    if (shareIds.length === 0) return;
+                    if (shareFileIds.length === 0) return;
 
-                    if (shareIds.length === 1) {
+                    if (shareFileIds.length === 1) {
                         downloadMutate({
-                            shareFileIdList: shareIds,
+                            shareFileIdList: shareFileIds,
                             onDownloadProgress: setDownloadProgress
                         });
                     } else {
@@ -103,14 +136,23 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                     }
                 };
 
+                const isExpired = new Date(rowData.expireTime).getTime() <= Date.now();
+
                 return (
-                    <Button variant="ghost" size="sm" onClick={handleDownloadClick}>
-                        {
-                            downloadPending ? (<Label>{downloadProgress}%</Label>) : (<Download />)
-                        }
+                    <Button
+                        disabled={isExpired}
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDownloadClick}
+                    >
+                        {downloadPending ? (
+                            <Label>{downloadProgress}%</Label>
+                        ) : (
+                            <Download />
+                        )}
                     </Button>
                 );
-            },
+            }
         }
     ], [setSelectedFiles, setShowDialog, downloadMutate]);
 

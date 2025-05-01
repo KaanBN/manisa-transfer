@@ -6,7 +6,7 @@ export type ShareModel = {
     title: string;
     message: string;
     uploadTime: string;
-    expireTime: string | null;
+    expireTime: string;
     files: ShareFileModel[];
     status: number;
 };
