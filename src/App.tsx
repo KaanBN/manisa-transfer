@@ -5,8 +5,9 @@ import Navbar from "@/components/navbar";
 import UploadCard from "@/components/uploadCard.tsx";
 import UserFileTableCard from "@/components/userFileTableCard.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
-import {useTheme} from "@/components/themeProvider.tsx";
-import {useAuth} from "@/hooks/useAuth.ts";
+import {useTheme} from "@/context/themeProvider.tsx";
+import {useAuth} from "@/context/authContext.tsx";
+
 
 function App(): JSX.Element {
 

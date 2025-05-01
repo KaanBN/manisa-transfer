@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     Drawer,
     DrawerClose,
@@ -7,33 +8,40 @@ import {
     DrawerHeader,
     DrawerTitle
 } from "@/components/ui/drawer.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {Input} from "@/components/ui/input.tsx";
-import {useLogin} from "@/hooks/useLogin.ts";
+import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import Spinner from "@/components/spinner.tsx";
-import {useState} from "react";
+import { login as loginApi } from "@/api/auth/login";
+import {useAuth} from "@/context/authContext.tsx";
 
 type LoginDrawerProps = {
     open: boolean;
     setOpen: (open: boolean) => void;
-}
+};
 
 const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
-    const { mutate: login, isPending, isError, error } = useLogin();
+    const { login } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!username || !password) return;
-        login(
-            { username, password },
-            {
-                onSuccess: () => {
-                    setOpen(false);
-                }
-            }
-        );
+
+        setLoading(true);
+        setErrorMsg("");
+
+        try {
+            const res = await loginApi({ username, password });
+            login(res.data.token); // ✅ context login
+            setOpen(false);
+        } catch (err: any) {
+            setErrorMsg(err?.response?.data?.message || "Giriş sırasında hata oluştu.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -60,15 +68,13 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
-                            {isError && (
-                                <p className="mt-2 text-sm text-red-500">
-                                    {(error as any)?.response?.data?.message || "Giriş sırasında bir hata oluştu."}
-                                </p>
+                            {errorMsg && (
+                                <p className="mt-2 text-sm text-red-500">{errorMsg}</p>
                             )}
                         </div>
                         <DrawerFooter>
-                            <Button type="submit" disabled={isPending}>
-                                {isPending ? <Spinner /> : "Giriş Yap"}
+                            <Button type="submit" disabled={loading}>
+                                {loading ? <Spinner /> : "Giriş Yap"}
                             </Button>
                             <DrawerClose asChild>
                                 <Button variant="outline" type="button">İptal</Button>
