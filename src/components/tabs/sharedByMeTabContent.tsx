@@ -1,37 +1,45 @@
 import * as React from "react"
-import {
-    ColumnDef,
-    getCoreRowModel,
-    getPaginationRowModel,
-    useReactTable,
-    flexRender, ColumnFiltersState, getFilteredRowModel,
-} from "@tanstack/react-table"
+import {forwardRef, useImperativeHandle, useState} from "react"
+import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
-import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useImperativeHandle, useState} from "react";
-import {Button} from "@/components/ui/button.tsx";
-import {Download} from "lucide-react";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
+import {Input} from "@/components/ui/input.tsx"
 import {PaginationHandle} from "@/types/paginationHandle.ts";
 import {useListSent} from "@/hooks/useListSent.ts";
 import Spinner from "@/components/spinner.tsx";
-import {format} from "date-fns";
-import {tr} from "date-fns/locale";
 import {ShareModel} from "@/models/shareModel.ts";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
+import {format} from "date-fns";
+import {tr} from "date-fns/locale";
+import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
+import {Download} from "lucide-react";
+import {useDebounce} from "@/hooks/useDebounce.ts";
 
 const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const { data, isPending, isError, error } = useListSent();
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10,
+    });
+
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [downloadProgress, setDownloadProgress] = useState(0)
+
+    const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
+    const debouncedUserName = useDebounce(userNameFilter, 500);
+
+    const { data, isPending, isError, error } = useListSent({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        username: debouncedUserName,
+    });
+
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
-    const [showDialog, setShowDialog] = React.useState(false);
-    const [selectedFiles, setSelectedFiles] = React.useState<ShareFileModel[]>([]);
-    const [downloadProgress, setDownloadProgress] = useState<number>(0);
-
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<ShareFileModel[]>([]);
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
@@ -159,14 +167,15 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const table = useReactTable({
         data: data?.data ?? [],
         columns,
-        filterFns: {},
+        manualPagination: true,
+        pageCount: Math.ceil((data?.totalCount ?? 0) / pagination.pageSize),
         state: {
+            pagination,
             columnFilters,
         },
+        onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
     });
 
     useImperativeHandle(ref, () => ({
@@ -198,7 +207,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
             <div className="py-4">
                 <Input
                     placeholder="Gönderilene göre filtrele..."
-                    value={(table.getColumn("userName")?.getFilterValue() as string) ?? ""}
+                    value={userNameFilter ?? ""}
                     onChange={(event) =>
                         table.getColumn("userName")?.setFilterValue(event.target.value)
                     }
@@ -209,9 +218,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow
-                                className={"hover:bg-muted bg-muted"}
-                                key={headerGroup.id}>
+                            <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id}>
                                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -248,7 +255,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 setShowFileListModal={setShowDialog}
             />
         </div>
-    )
+    );
 });
 
-export default SharedByMeTabContent
+export default SharedByMeTabContent;

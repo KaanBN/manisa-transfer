@@ -2,11 +2,9 @@ import * as React from "react"
 import {
     ColumnDef,
     getCoreRowModel,
-    getPaginationRowModel,
     useReactTable,
     flexRender,
     ColumnFiltersState,
-    getFilteredRowModel,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Button } from "@/components/ui/button.tsx"
@@ -23,20 +21,35 @@ import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
+import {useDebounce} from "@/hooks/useDebounce.ts";
 
 const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
-    const { data, isPending, isError, error } = useListReceived();
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10,
+    });
+
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [downloadProgress, setDownloadProgress] = useState(0)
+
+    const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
+    const debouncedUserName = useDebounce(userNameFilter, 500);
+
+    const { data, isPending, isError, error } = useListReceived({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        username: debouncedUserName,
+    });
+
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [showDialog, setShowDialog] = React.useState(false);
-    const [selectedFiles, setSelectedFiles] = React.useState<ShareFileModel[]>([]);
-    const [downloadProgress, setDownloadProgress] = useState<number>(0);
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<ShareFileModel[]>([]);
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
             accessorKey: "userName",
-            header: "Gönderilen",
+            header: "Gönderen",
             cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
@@ -159,14 +172,15 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const table = useReactTable({
         data: data?.data ?? [],
         columns,
-        filterFns: {},
+        manualPagination: true,
+        pageCount: Math.ceil((data?.totalCount ?? 0) / pagination.pageSize),
         state: {
+            pagination,
             columnFilters,
         },
+        onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
     });
 
     useImperativeHandle(ref, () => ({
@@ -198,7 +212,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
             <div className="py-4">
                 <Input
                     placeholder="Gönderene göre filtrele..."
-                    value={(table.getColumn("userName")?.getFilterValue() as string) ?? ""}
+                    value={userNameFilter ?? ""}
                     onChange={(event) =>
                         table.getColumn("userName")?.setFilterValue(event.target.value)
                     }
@@ -209,9 +223,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow
-                                className={"hover:bg-muted bg-muted"}
-                                key={headerGroup.id}>
+                            <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id}>
                                         {flexRender(header.column.columnDef.header, header.getContext())}
