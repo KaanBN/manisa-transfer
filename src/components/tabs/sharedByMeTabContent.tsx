@@ -18,7 +18,11 @@ import {Label} from "@/components/ui/label.tsx";
 import {Download} from "lucide-react";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 
-const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
+type SharedByMeTabContentProps = {
+    onDataReady?: () => void;
+};
+
+const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentProps>(({ onDataReady }, ref) => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -30,11 +34,26 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error } = useListSent({
+    const { data, isPending, isError, error, isPlaceholderData } = useListSent({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         username: debouncedUserName,
     });
+
+    React.useEffect(() => {
+        if (!isPlaceholderData && debouncedUserName) {
+            setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+            }));
+        }
+    }, [debouncedUserName, isPlaceholderData]);
+
+    React.useEffect(() => {
+        if (!isPlaceholderData && !isPending && onDataReady) {
+            onDataReady();
+        }
+    }, [data, isPlaceholderData, isPending]);
 
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
@@ -168,7 +187,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
         data: data?.data ?? [],
         columns,
         manualPagination: true,
-        pageCount: Math.ceil((data?.totalCount ?? 0) / pagination.pageSize),
+        pageCount: Math.ceil((data?.totalRowCount ?? 0) / pagination.pageSize),
         state: {
             pagination,
             columnFilters,

@@ -23,7 +23,11 @@ import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 
-const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
+type SharedWithMeTabContentProps = {
+    onDataReady?: () => void;
+};
+
+const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabContentProps>(({ onDataReady }, ref) => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -35,11 +39,26 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error } = useListReceived({
+    const { data, isPending, isError, error, isPlaceholderData } = useListReceived({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         username: debouncedUserName,
     });
+
+    React.useEffect(() => {
+        if (!isPlaceholderData && debouncedUserName) {
+            setPagination((prev) => ({
+                ...prev,
+                pageIndex: 0,
+            }));
+        }
+    }, [debouncedUserName, isPlaceholderData]);
+
+    React.useEffect(() => {
+        if (!isPlaceholderData && !isPending && onDataReady) {
+            onDataReady();
+        }
+    }, [data, isPlaceholderData, isPending]);
 
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
@@ -173,7 +192,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle>((_, ref) => {
         data: data?.data ?? [],
         columns,
         manualPagination: true,
-        pageCount: Math.ceil((data?.totalCount ?? 0) / pagination.pageSize),
+        pageCount: Math.ceil((data?.totalRowCount ?? 0) / pagination.pageSize),
         state: {
             pagination,
             columnFilters,

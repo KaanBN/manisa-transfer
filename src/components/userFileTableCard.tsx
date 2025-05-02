@@ -23,52 +23,24 @@ function UserFileTableCard(): JSX.Element {
     const [canGoNext, setCanGoNext] = useState(false);
     const [canGoPrevious, setCanGoPrevious] = useState(false);
 
+    const updateNavigationState = () => {
+        const activeRef = activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef;
+        if (activeRef.current) {
+            setCanGoNext(activeRef.current.getCanNextPage());
+            setCanGoPrevious(activeRef.current.getCanPreviousPage());
+        }
+    };
+
     useEffect(() => {
-        const updateNavigationState = () => {
-            const activeRef = activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef;
-
-            if (activeRef.current) {
-                const canNext = activeRef.current.getCanNextPage();
-                const canPrev = activeRef.current.getCanPreviousPage();
-
-                setCanGoNext(canNext);
-                setCanGoPrevious(canPrev);
-            }
-        };
-
-        setTimeout(updateNavigationState, 0);
+        updateNavigationState();
     }, [activeTab]);
 
     const handleNextPage = () => {
-        if (activeTab === "shared-with-me") {
-            sharedWithMeRef.current?.nextPage();
-        } else {
-            sharedByMeRef.current?.nextPage();
-        }
-
-        setTimeout(() => {
-            const activeRef = activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef;
-            if (activeRef.current) {
-                setCanGoNext(activeRef.current.getCanNextPage());
-                setCanGoPrevious(activeRef.current.getCanPreviousPage());
-            }
-        }, 0);
+        (activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef).current?.nextPage();
     };
 
     const handlePreviousPage = () => {
-        if (activeTab === "shared-with-me") {
-            sharedWithMeRef.current?.previousPage();
-        } else {
-            sharedByMeRef.current?.previousPage();
-        }
-
-        setTimeout(() => {
-            const activeRef = activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef;
-            if (activeRef.current) {
-                setCanGoNext(activeRef.current.getCanNextPage());
-                setCanGoPrevious(activeRef.current.getCanPreviousPage());
-            }
-        }, 0);
+        (activeTab === "shared-with-me" ? sharedWithMeRef : sharedByMeRef).current?.previousPage();
     };
 
     return (
@@ -83,10 +55,16 @@ function UserFileTableCard(): JSX.Element {
 
                 <CardContent className="flex-1 overflow-auto">
                     <TabsContent value="shared-with-me">
-                        <SharedWithMeTabContent ref={sharedWithMeRef} />
+                        <SharedWithMeTabContent
+                            ref={sharedWithMeRef}
+                            onDataReady={updateNavigationState}
+                        />
                     </TabsContent>
                     <TabsContent value="shared-by-me">
-                        <SharedByMeTabContent ref={sharedByMeRef} />
+                        <SharedByMeTabContent
+                            ref={sharedByMeRef}
+                            onDataReady={updateNavigationState}
+                        />
                     </TabsContent>
                 </CardContent>
 
