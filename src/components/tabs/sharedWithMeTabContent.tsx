@@ -32,7 +32,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         pageIndex: 0,
         pageSize: 10,
     });
-
+    const previousDebouncedRef = React.useRef<string | undefined>(undefined);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [downloadProgress, setDownloadProgress] = useState(0)
 
@@ -46,7 +46,11 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
     });
 
     React.useEffect(() => {
-        if (!isPlaceholderData && debouncedUserName) {
+        if (
+            !isPlaceholderData &&
+            previousDebouncedRef.current !== debouncedUserName
+        ) {
+            previousDebouncedRef.current = debouncedUserName;
             setPagination((prev) => ({
                 ...prev,
                 pageIndex: 0,
