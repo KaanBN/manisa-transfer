@@ -10,15 +10,29 @@ import { useState } from "react";
 import LoginDrawer from "@/components/loginDrawer.tsx";
 import { ThemeToggle } from "@/components/themeToggle.tsx";
 import {useAuth} from "@/context/authContext.tsx";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
     return (
         <nav>
             <div className="navbar-container">
+                {
+                    user?.role === "Admin" && (
+                        <Button className="mr-auto" onClick={() => {
+                            location.pathname === "/admin" ? (navigate("/")) : (navigate("/admin"))
+                        }}>
+                            {
+                                location.pathname === "/admin" ? ("Panelden çık") : ("Panele Git")
+                            }
+                        </Button>
+                    )
+                }
                 {user ? (
                     <Menubar>
                         <MenubarMenu>
@@ -41,7 +55,7 @@ const Navbar: React.FC = () => {
                             Giriş Yap
                         </Button>
 
-                        <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen} />
+                        <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen}/>
                     </>
                 )}
                 <ThemeToggle />

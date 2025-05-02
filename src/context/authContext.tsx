@@ -14,6 +14,7 @@ type AuthUser = {
     username: string;
     fullName: string;
     token: string;
+    role: string;
 };
 
 type AuthContextType = {
@@ -46,6 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     username: decoded.username,
                     fullName: decoded.fullName,
                     token,
+                    role: decoded.role,
                 });
             } catch {
                 setUser(null);
@@ -65,6 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             username: decoded.username,
             fullName: decoded.fullName,
             token,
+            role: decoded.role,
         });
     };
 

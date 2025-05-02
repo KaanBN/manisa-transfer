@@ -2,17 +2,16 @@ import {JSX} from 'react';
 import bg from './assets/images/background.png';
 import bgDark from './assets/images/background-dark.png';
 import Navbar from "@/components/navbar";
-import UploadCard from "@/components/uploadCard.tsx";
-import UserFileTableCard from "@/components/userFileTableCard.tsx";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import {useTheme} from "@/context/themeProvider.tsx";
-import {useAuth} from "@/context/authContext.tsx";
+import {Navigate, Route, Routes} from "react-router-dom";
+import HomePage from "@/routes/homePage.tsx";
+import AdminPage from "@/routes/adminPage.tsx";
+import ProtectedRoute from "@/routes/protectedRoute.tsx";
 
 
 function App(): JSX.Element {
-
     const { theme } = useTheme()
-    const { isAuthenticated } = useAuth()
 
     return (
         <div
@@ -24,19 +23,18 @@ function App(): JSX.Element {
             <Toaster richColors={true} />
             <Navbar />
 
-            <main className="flex flex-col lg:flex-row justify-between p-6 gap-6 flex-1">
-                <div className="lg:self-center">
-                    <UploadCard />
-                </div>
-
-                {
-                    isAuthenticated && (
-                        <div className="flex-1 min-w-0 lg:self-center">
-                            <UserFileTableCard />
-                        </div>
-                    )
-                }
-            </main>
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <AdminPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
 
             <footer className="text-center text-xs text-white py-4">
                 © {new Date().getFullYear()} Spiltech. Tüm hakları saklıdır.
