@@ -1,4 +1,5 @@
 import axios from "axios";
+import {getLogoutFunction} from "@/context/authContext.tsx";
 
 const apiClient = axios.create({
     baseURL: "http://localhost:5138/api"
@@ -17,8 +18,8 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem("accessToken");
-            window.dispatchEvent(new Event("storage"));
+            const logout = getLogoutFunction();
+            logout();
         }
         return Promise.reject(error);
     }

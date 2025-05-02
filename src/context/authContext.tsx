@@ -25,6 +25,14 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+let logoutFn = () => {};
+
+export const setLogoutFunction = (fn: () => void) => {
+    logoutFn = fn;
+};
+
+export const getLogoutFunction = () => logoutFn;
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<AuthUser | null>(null);
 
@@ -43,6 +51,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setUser(null);
             }
         }
+    }, []);
+
+    useEffect(() => {
+        setLogoutFunction(logout);
     }, []);
 
     const login = (token: string) => {

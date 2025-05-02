@@ -86,11 +86,11 @@ function UploadCard(): JSX.Element {
 
     return (
         <Card className="lg:w-[17.5em] w-full max-h-[30em]">
-            <div className="flex justify-center gap-1 px-6">
-                <div {...getRootProps()} className="w-full">
+            <div className="flex justify-center items-center gap-1 px-6">
+                <div {...getRootProps()}>
                     <input {...getInputProps()} id="fileInput" />
                     <Button
-                        className="w-full h-full flex flex-col"
+                        className="h-full flex flex-col"
                         variant="outline"
                         onClick={() => document.getElementById("fileInput")?.click()}
                     >

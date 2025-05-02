@@ -28,7 +28,7 @@ const Navbar: React.FC = () => {
                             <MenubarContent align="end">
                                 <MenubarItem
                                     className="text-red-400 focus:bg-red-400 focus:text-white"
-                                    onClick={logout} // ✅ doğrudan context logout
+                                    onClick={logout}
                                 >
                                     Çıkış Yap
                                 </MenubarItem>
