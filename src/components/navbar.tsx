@@ -36,12 +36,12 @@ const Navbar: React.FC = () => {
                 {user ? (
                     <Menubar>
                         <MenubarMenu>
-                            <MenubarTrigger className="bg-accent text-accent-foreground">
+                            <MenubarTrigger className="bg-accent text-accent-foreground cursor-pointer">
                                 {user.fullName}
                             </MenubarTrigger>
                             <MenubarContent align="end">
                                 <MenubarItem
-                                    className="text-red-400 focus:bg-red-400 focus:text-white"
+                                    className="text-red-400 focus:bg-red-400 focus:text-white cursor-pointer transition duration-150 "
                                     onClick={logout}
                                 >
                                     Çıkış Yap

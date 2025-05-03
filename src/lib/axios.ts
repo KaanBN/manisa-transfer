@@ -2,7 +2,7 @@ import axios from "axios";
 import {getLogoutFunction} from "@/context/authContext.tsx";
 
 const apiClient = axios.create({
-    baseURL: "http://localhost:5138/api"
+    baseURL: import.meta.env.VITE_API_BASE_URL
 });
 
 apiClient.interceptors.request.use((config) => {

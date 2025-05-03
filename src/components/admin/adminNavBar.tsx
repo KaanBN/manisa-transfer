@@ -14,6 +14,12 @@ const AdminNavBar = () => {
                     Kullanıcılar
                 </TabsTrigger>
                 <TabsTrigger
+                    value="files"
+                    className="min-w-[8rem] lg:min-w-0 w-full text-left px-4 py-2 data-[state=active]:bg-muted data-[state=active]:font-bold"
+                >
+                    Dosyalar
+                </TabsTrigger>
+                <TabsTrigger
                     value="settings"
                     className="min-w-[8rem] lg:min-w-0 w-full text-left px-4 py-2 data-[state=active]:bg-muted data-[state=active]:font-bold"
                 >

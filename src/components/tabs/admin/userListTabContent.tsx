@@ -1,35 +1,47 @@
 import * as React from "react"
-import {forwardRef, useImperativeHandle, useState} from "react"
-import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
-
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
+import {useState} from "react"
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
+} from "@/components/ui/table.tsx"
 import {Input} from "@/components/ui/input.tsx"
-import {PaginationHandle} from "@/types/paginationHandle.ts";
-import {useListSent} from "@/hooks/useListSent.ts";
-import Spinner from "@/components/spinner.tsx";
-import {Button} from "@/components/ui/button.tsx";
-import {Download} from "lucide-react";
-import {useDebounce} from "@/hooks/useDebounce.ts";
-import {UserModel} from "@/models/userModel.ts";
-import {useListUser} from "@/hooks/useListUser.ts";
+import {useDebounce} from "@/hooks/useDebounce.ts"
+import {useAdminListUser} from "@/hooks/admin/useAdminListUser.ts"
+import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts"
+import {Button} from "@/components/ui/button.tsx"
+import Spinner from "@/components/spinner.tsx"
+import {MoreHorizontal} from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
 
-type UserListTabContentProps = {
-    onDataReady?: () => void;
-};
 
-const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>(({ onDataReady }, ref) => {
+function UserListTabContent() {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
     });
+
     const previousDebouncedRef = React.useRef<string | undefined>(undefined);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error, isPlaceholderData } = useListUser({
-        name: debouncedUserName,
+    const { data, isPending, isError, error, isPlaceholderData } = useAdminListUser({
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+        username: debouncedUserName,
     });
 
     React.useEffect(() => {
@@ -45,39 +57,65 @@ const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>
         }
     }, [debouncedUserName, isPlaceholderData]);
 
-    React.useEffect(() => {
-        if (!isPlaceholderData && !isPending && onDataReady) {
-            onDataReady();
-        }
-    }, [data, isPlaceholderData, isPending]);
-
-    const columns = React.useMemo<ColumnDef<UserModel>[]>(() => [
+    const columns = React.useMemo<ColumnDef<DetailedUserModel>[]>(() => [
+        {
+            accessorKey: "displayName",
+            header: "Görünen Ad",
+            cell: ({ row }) => <div className="font-medium">{row.getValue("displayName")}</div>,
+        },
         {
             accessorKey: "userName",
-            header: "Gönderilen",
+            header: "Kullanıcı Adı",
             cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
-            id: "actions",
-            header: "",
+            accessorKey: "maxUploadSize",
+            header: "Max Yükleme Kapasitesi",
+            cell: ({ row }) => <div className="font-medium">{row.getValue("maxUploadSize")} bayt</div>,
+        },
+        {
+            accessorKey: "role",
+            header: "Rol",
             cell: ({ row }) => {
-                const rowData = row.original;
-
+                const encodedRole = row.getValue("role");
+                var role = "";
+                switch (encodedRole) {
+                    case 1:
+                        role = "Admin";
+                        break;
+                    default:
+                        role = "Kullanıcı";
+                        break;
+                }
+                return (<div className="font-medium">{role}</div>);
+            },
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({  }) => {
                 return (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {}}
-                    >
-                        {rowData.id}
-                        <Download />
-                    </Button>
-                );
-            }
-        }
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() => {}}
+                            >
+                                Yükleme Kapasitesini Değiştir
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )
+            },
+        },
     ], []);
 
-    const table = useReactTable<UserModel>({
+    const table = useReactTable<DetailedUserModel>({
         data: data?.data ?? [],
         columns,
         manualPagination: true,
@@ -91,17 +129,10 @@ const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>
         getCoreRowModel: getCoreRowModel(),
     });
 
-    useImperativeHandle(ref, () => ({
-        previousPage: () => table.previousPage(),
-        nextPage: () => table.nextPage(),
-        getCanNextPage: () => table.getCanNextPage(),
-        getCanPreviousPage: () => table.getCanPreviousPage(),
-    }));
-
     if (isPending) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Spinner color={"#ff00ff"}/>
+                <Spinner color={"#ff00ff"} />
                 <span className={"ml-2"}>Yükleniyor...</span>
             </div>
         );
@@ -116,10 +147,10 @@ const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>
     }
 
     return (
-        <div className="w-full h-full flex flex-col">
-            <div className="py-4">
+        <AdminTabDiv>
+            <div className="pb-4">
                 <Input
-                    placeholder="Gönderilene göre filtrele..."
+                    placeholder="Kullanıcı adına göre filtrele..."
                     value={userNameFilter ?? ""}
                     onChange={(event) =>
                         table.getColumn("userName")?.setFilterValue(event.target.value)
@@ -127,6 +158,7 @@ const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>
                     className="max-w-sm"
                 />
             </div>
+
             <div className="flex-1 overflow-y-auto rounded-md border">
                 <Table>
                     <TableHeader>
@@ -161,8 +193,27 @@ const UserListTabContent = forwardRef<PaginationHandle, UserListTabContentProps>
                     </TableBody>
                 </Table>
             </div>
-        </div>
+
+            <div className="flex justify-end gap-2 mt-4">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                >
+                    Geri
+                </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                >
+                    İleri
+                </Button>
+            </div>
+        </AdminTabDiv>
     );
-});
+}
 
 export default UserListTabContent;

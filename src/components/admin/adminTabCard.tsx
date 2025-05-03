@@ -1,14 +1,15 @@
-import {Card} from "@/components/ui/card.tsx";
+import * as React from "react";
 
+type AdminTabDivProps = {
+    children: React.ReactNode;
+}
 
-const AdminTabCard = () => {
+const AdminTabDiv = ({children}: AdminTabDivProps) => {
     return (
-        <Card className="w-full p-0 md:p-3">
-            <div className="flex gap-1">
-
-            </div>
-        </Card>
+        <div className="w-full h-full flex flex-col lg:min-h-[75vh] 2xl:min-h-[770px] lg:max-h-[75vh]">
+            {children}
+        </div>
     );
 };
 
-export default AdminTabCard;
+export default AdminTabDiv;
