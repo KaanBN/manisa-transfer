@@ -1,38 +1,30 @@
-import * as React from "react"
-import {useState} from "react"
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from "@/components/ui/table.tsx"
-import {useDebounce} from "@/hooks/useDebounce.ts"
-import {Button} from "@/components/ui/button.tsx"
-import Spinner from "@/components/spinner.tsx"
-import {MoreHorizontal} from 'lucide-react';
+import {useEffect, useState} from "react";
+import * as React from "react";
+import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {DetailedShareModel} from "@/models/admin/detailedShareModel.ts";
+import {useDebounce} from "@/hooks/useDebounce.ts";
+import {useAdminListFile} from "@/hooks/admin/useAdminListFile.ts";
+import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
+import {UserModel} from "@/models/userModel.ts";
+import {format} from "date-fns";
+import {tr} from "date-fns/locale";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem, DropdownMenuSeparator,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import {useAdminListFile} from "@/hooks/admin/useAdminListFile.ts";
-import {DetailedShareModel} from "@/models/admin/detailedShareModel.ts";
-import {format} from "date-fns";
-import {tr} from "date-fns/locale";
-import {UserModel} from "@/models/userModel.ts";
-import {Input} from "@/components/ui/input.tsx";
+} from "@/components/ui/dropdown-menu.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {MoreHorizontal} from "lucide-react";
+import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import AdminDeleteShareAlertDialog from "@/components/tabs/admin/adminDeleteShareAlertDialog.tsx";
-import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
-import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 import AdminDownloadFilesDialog from "@/components/admin/adminDownloadFilesDialog.tsx";
+import {toast} from "sonner";
 
-function FileListTabContent() {
+const FileListPage = () => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -57,7 +49,13 @@ function FileListTabContent() {
         senderUsername: debouncedSenderUserName,
         receiverUsername: debouncedReceiverUserName
     });
-    const { mutate: downloadMutate, isPending: isDownloadPending } = useDownloadFile();
+    const { mutate: downloadMutate } = useDownloadFile();
+
+    useEffect(() => {
+        if (isError && error) {
+            toast.error(error.message);
+        }
+    }, [isError]);
 
     React.useEffect(() => {
         if (
@@ -242,18 +240,22 @@ function FileListTabContent() {
 
     if (isPending) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <Spinner color={"#ff00ff"} />
-                <span className={"ml-2"}>Yükleniyor...</span>
-            </div>
+            <AdminTabDiv>
+                <div className="flex items-center justify-center h-full">
+                    <Spinner color={"#ff00ff"} />
+                    <span className={"ml-2"}>Yükleniyor...</span>
+                </div>
+            </AdminTabDiv>
         );
     }
 
     if (isError) {
         return (
-            <div className="text-center text-red-500 mt-4">
-                Bir hata oluştu: {error?.message}
-            </div>
+            <AdminTabDiv>
+                <div className="text-center text-red-500 mt-4">
+                    Bir hata oluştu: {error?.message}
+                </div>
+            </AdminTabDiv>
         );
     }
 
@@ -353,4 +355,4 @@ function FileListTabContent() {
     );
 }
 
-export default FileListTabContent;
+export default FileListPage;

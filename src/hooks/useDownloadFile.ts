@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { downloadFiles } from "@/api/file/downloadFiles";
+import {toast} from "sonner";
 
 export const useDownloadFile = (onSuccess?: () => void) => {
     return useMutation({
@@ -7,5 +8,8 @@ export const useDownloadFile = (onSuccess?: () => void) => {
         onSuccess: () => {
             if (onSuccess) onSuccess();
         },
+        onError: () => {
+            toast.error("Dosya indirilirken hata oluştu.");
+        }
     });
 };

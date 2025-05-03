@@ -9,7 +9,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useImperativeHandle, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {Download} from "lucide-react";
@@ -22,6 +22,7 @@ import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useDebounce} from "@/hooks/useDebounce.ts";
+import {toast} from "sonner";
 
 type SharedWithMeTabContentProps = {
     onDataReady?: () => void;
@@ -44,6 +45,12 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         pageSize: pagination.pageSize,
         username: debouncedUserName,
     });
+
+    useEffect(() => {
+        if (isError && error) {
+            toast.error(error.message);
+        }
+    }, [error]);
 
     React.useEffect(() => {
         if (

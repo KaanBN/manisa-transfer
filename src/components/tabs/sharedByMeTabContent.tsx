@@ -1,5 +1,5 @@
 import * as React from "react"
-import {forwardRef, useImperativeHandle, useState} from "react"
+import {forwardRef, useEffect, useImperativeHandle, useState} from "react"
 import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
 
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
@@ -17,6 +17,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Download} from "lucide-react";
 import {useDebounce} from "@/hooks/useDebounce.ts";
+import {toast} from "sonner";
 
 type SharedByMeTabContentProps = {
     onDataReady?: () => void;
@@ -40,7 +41,13 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         username: debouncedUserName,
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
+        if (isError && error) {
+            toast.error(error.message);
+        }
+    }, [error]);
+
+    useEffect(() => {
         if (
             !isPlaceholderData &&
             previousDebouncedRef.current !== debouncedUserName
@@ -53,7 +60,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         }
     }, [debouncedUserName, isPlaceholderData]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!isPlaceholderData && !isPending && onDataReady) {
             onDataReady();
         }

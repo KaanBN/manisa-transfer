@@ -1,37 +1,32 @@
-import * as React from "react"
-import {useState} from "react"
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from "@tanstack/react-table"
-import {
-    Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from "@/components/ui/table.tsx"
-import {Input} from "@/components/ui/input.tsx"
-import {useDebounce} from "@/hooks/useDebounce.ts"
-import {useAdminListUser} from "@/hooks/admin/useAdminListUser.ts"
-import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts"
-import {Button} from "@/components/ui/button.tsx"
-import Spinner from "@/components/spinner.tsx"
-import {MoreHorizontal} from 'lucide-react';
+import {useEffect, useState} from "react";
+import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts";
+import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import * as React from "react";
+import {useDebounce} from "@/hooks/useDebounce.ts";
+import {useAdminListUser} from "@/hooks/admin/useAdminListUser.ts";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu.tsx";
+import {Button} from "@/components/ui/button.tsx";
+import {MoreHorizontal, UserPlus} from "lucide-react";
+import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import UpdateUploadSizeDialog from "@/components/admin/updateUploadSizeDialog.tsx";
+import {toast} from "sonner";
+import NewUserDialog from "@/components/admin/newUserDialog.tsx";
 
-function UserListTabContent() {
+const UserListPage = () => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
     });
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [newUserDialogOpen, setNewUserDialogOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<DetailedUserModel | null>(null);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -51,7 +46,13 @@ function UserListTabContent() {
         username: debouncedUserName,
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
+        if (isError && error) {
+            toast.error(error.message);
+        }
+    }, [error]);
+
+    useEffect(() => {
         if (
             !isPlaceholderData &&
             previousDebouncedRef.current !== debouncedUserName
@@ -122,7 +123,6 @@ function UserListTabContent() {
         },
     ], []);
 
-
     const table = useReactTable<DetailedUserModel>({
         data: data?.data ?? [],
         columns,
@@ -156,7 +156,7 @@ function UserListTabContent() {
 
     return (
         <AdminTabDiv>
-            <div className="pb-4">
+            <div className={"flex flex-col sm:flex-row w-full justify-between"}>
                 <Input
                     placeholder="Kullanıcı adına göre filtrele..."
                     value={userNameFilter ?? ""}
@@ -165,6 +165,11 @@ function UserListTabContent() {
                     }
                     className="max-w-sm"
                 />
+
+                <Button onClick={()=>{setNewUserDialogOpen(true)}}>
+                    <UserPlus/>
+                    Yeni Kullanıcı
+                </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto rounded-md border">
@@ -230,8 +235,12 @@ function UserListTabContent() {
                 />
             )}
 
+            <NewUserDialog
+                open={newUserDialogOpen}
+                onClose={() => setNewUserDialogOpen(false)}
+            />
         </AdminTabDiv>
     );
 }
 
-export default UserListTabContent;
+export default UserListPage;

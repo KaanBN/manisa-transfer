@@ -14,7 +14,7 @@ export const useAdminListFile = ({
     senderUsername?: string;
     receiverUsername?: string;
 }) => {
-    return useQuery<AdminFileListResponse, AxiosError>({
+    return useQuery<AdminFileListResponse, AxiosError, AdminFileListResponse>({
         queryKey: ["adminFiles", pageIndex, pageSize, senderUsername, receiverUsername],
         queryFn: () =>
             adminFetchFiles({
@@ -23,6 +23,7 @@ export const useAdminListFile = ({
                 senderUsername,
                 receiverUsername
             }),
-        placeholderData: keepPreviousData
+        placeholderData: keepPreviousData,
     });
+
 };

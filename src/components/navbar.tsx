@@ -11,7 +11,7 @@ import LoginDrawer from "@/components/loginDrawer.tsx";
 import { ThemeToggle } from "@/components/themeToggle.tsx";
 import {useAuth} from "@/context/authContext.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Shield} from "lucide-react";
+import {EllipsisVertical} from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,7 +22,11 @@ import {
     DropdownMenuTrigger
 } from "./ui/dropdown-menu";
 
-const Navbar: React.FC = () => {
+type Props = {
+    setOpenDialog: (open: boolean) => void;
+}
+
+const Navbar: React.FC<Props> = ({setOpenDialog}) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -59,27 +63,39 @@ const Navbar: React.FC = () => {
                 )}
                 {
                     user?.role === "Admin" && (
-                        /*<Button
-                            onClick={() => {
-                                location.pathname === "/admin" ? (navigate("/")) : (navigate("/admin"))
-                            }}>
-                            <EllipsisVertical/>
-                        </Button>*/
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline"><Shield/></Button>
+                                <Button variant="outline"><EllipsisVertical/></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56">
                                 <DropdownMenuLabel>Admin</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            navigate("/admin/users");
+                                        }}
+                                        className={location.pathname == "/admin/users" ? "bg-primary/10 focus:bg-primary/30 text-primary" : ""}
+                                    >
                                         Kullanıcılar
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            navigate("/admin/files");
+                                        }}
+                                        className={location.pathname == "/admin/files" ? "bg-primary/10 focus:bg-primary/30 text-primary" : ""}
+                                    >
                                         Dosyalar
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        setOpenDialog(true);
+                                    }}
+                                >
+                                    Ayarlar
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     )

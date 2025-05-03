@@ -45,9 +45,6 @@ const AdminDeleteShareAlertDialog = ({open, onClose, selectedShareId}:DeleteAler
                                         }).then(() => {
                                             onClose()
                                         })
-                                    },
-                                    onError: (err: any) => {
-                                        toast.error(err.response.data.message ?? "Bir hata oluştu");
                                     }
                                 }
                             )

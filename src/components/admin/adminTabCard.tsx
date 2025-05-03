@@ -1,4 +1,5 @@
 import * as React from "react";
+import {Card} from "@/components/ui/card.tsx";
 
 type AdminTabDivProps = {
     children: React.ReactNode;
@@ -6,8 +7,10 @@ type AdminTabDivProps = {
 
 const AdminTabDiv = ({children}: AdminTabDivProps) => {
     return (
-        <div className="w-full h-full flex flex-col lg:min-h-[75vh] 2xl:min-h-[770px] lg:max-h-[75vh]">
-            {children}
+        <div className={"mx-3 my-auto h-full"}>
+            <Card className="w-full h-full p-3 ">
+                {children}
+            </Card>
         </div>
     );
 };

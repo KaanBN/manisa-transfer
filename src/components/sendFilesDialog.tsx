@@ -20,14 +20,13 @@ type SendFilesDialogProps = {
 }
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, setFiles}) => {
-    const {mutate: sendFiles, isPending, isError, error} = useSendFiles();
+    const {mutate: sendFiles, isPending} = useSendFiles();
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
     const [showLinkModal, setShowLinkModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserModel | undefined>();
     const [title, setTitle] = useState("")
     const [message, setMessage] = useState("")
     const [uploadProgress, setUploadProgress] = useState<number>(0);
-
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -60,10 +59,8 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                     setOpen(false);
                     setFiles([]);
                 }
-
             }
         )
-
     }
 
     return (
@@ -118,31 +115,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                                     />
                                 </div>
 
-                                {/*
-                        <div className="grid gap-2">
-                            <Label>Süre</Label>
-                            <Select value={duration} onValueChange={setDuration}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Saklanacak süre" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {durations.map((item) => (
-                                            <SelectItem key={item.value} value={item.value}>
-                                                {item.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>*/}
-
                                 <DialogFooter>
-                                    {isError && (
-                                        <p className="mt-2 text-sm text-red-500">
-                                            {(error as any)?.response?.data?.message || "Giriş sırasında bir hata oluştu."}
-                                        </p>
-                                    )}
                                     <Button type="submit" disabled={isPending}>
                                         {isPending ? <Spinner/> : "Gönder"}
                                     </Button>

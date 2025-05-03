@@ -28,7 +28,7 @@ const DownloadFilesDialog = ({
                              }: DownloadFilesDialogProps) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [downloadProgress, setDownloadProgress] = useState<number>(0);
-    const { mutate: downloadMutate, isPending: downloadPending, isError } = useDownloadFile();
+    const { mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
 
     useEffect(() => {
         if (!showFileListModal)
@@ -97,11 +97,6 @@ const DownloadFilesDialog = ({
                         <div className="w-full mt-4">
                             <div className="text-sm mb-1">İndirme: %{downloadProgress}</div>
                             <Progress value={downloadProgress} />
-                        </div>
-                    )}
-                    {isError && (
-                        <div className="w-full mt-4">
-                            <div className="text-sm mb-1">error</div>
                         </div>
                     )}
                     <Button
