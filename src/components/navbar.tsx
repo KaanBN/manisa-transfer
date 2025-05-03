@@ -11,6 +11,16 @@ import LoginDrawer from "@/components/loginDrawer.tsx";
 import { ThemeToggle } from "@/components/themeToggle.tsx";
 import {useAuth} from "@/context/authContext.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
+import {Shield} from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "./ui/dropdown-menu";
 
 const Navbar: React.FC = () => {
     const { user, logout } = useAuth();
@@ -22,17 +32,6 @@ const Navbar: React.FC = () => {
     return (
         <nav>
             <div className="navbar-container">
-                {
-                    user?.role === "Admin" && (
-                        <Button className="mr-auto" onClick={() => {
-                            location.pathname === "/admin" ? (navigate("/")) : (navigate("/admin"))
-                        }}>
-                            {
-                                location.pathname === "/admin" ? ("Panelden çık") : ("Panele Git")
-                            }
-                        </Button>
-                    )
-                }
                 {user ? (
                     <Menubar>
                         <MenubarMenu>
@@ -58,6 +57,33 @@ const Navbar: React.FC = () => {
                         <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen}/>
                     </>
                 )}
+                {
+                    user?.role === "Admin" && (
+                        /*<Button
+                            onClick={() => {
+                                location.pathname === "/admin" ? (navigate("/")) : (navigate("/admin"))
+                            }}>
+                            <EllipsisVertical/>
+                        </Button>*/
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline"><Shield/></Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56">
+                                <DropdownMenuLabel>Admin</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem>
+                                        Kullanıcılar
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        Dosyalar
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )
+                }
                 <ThemeToggle />
             </div>
         </nav>

@@ -12,23 +12,26 @@ import {ShareFileModel} from "@/models/shareFileModel.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {Progress} from "@/components/ui/progress.tsx";
+import {useAdminDeleteShareFile} from "@/hooks/admin/useAdminDeleteShareFile.ts";
+import {toast} from "sonner";
 
-type DownloadFilesDialogProps = {
+type AdminDownloadFilesDialogProps = {
     showFileListModal: boolean;
     setShowFileListModal: (open: boolean) => void;
     fileList: ShareFileModel[];
     downloadable?: boolean;
 };
 
-const DownloadFilesDialog = ({
+const AdminDownloadFilesDialog = ({
                                  fileList,
                                  showFileListModal,
                                  setShowFileListModal,
                                  downloadable = true
-                             }: DownloadFilesDialogProps) => {
+                             }: AdminDownloadFilesDialogProps) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [downloadProgress, setDownloadProgress] = useState<number>(0);
-    const { mutate: downloadMutate, isPending: downloadPending, isError } = useDownloadFile();
+    const { mutate: downloadMutate, isPending: downloadPending, isError: downloadIsError, error: downloadError } = useDownloadFile();
+    const { mutate: deleteMutate, isPending: deletePending, isError: deleteIsError, error: deleteError } = useAdminDeleteShareFile();
 
     useEffect(() => {
         if (!showFileListModal)
@@ -36,6 +39,20 @@ const DownloadFilesDialog = ({
             setSelectedIds([]);
         }
     }, [showFileListModal]);
+
+    useEffect(() => {
+        if (deleteIsError)
+        {
+            toast.error(deleteError.message)
+        }
+    }, [deleteIsError]);
+
+    useEffect(() => {
+        if (downloadIsError)
+        {
+            toast.error(downloadError.message)
+        }
+    }, [downloadIsError]);
 
     const allSelected = selectedIds.length === fileList.length;
 
@@ -59,6 +76,12 @@ const DownloadFilesDialog = ({
         downloadMutate({
             shareFileIdList: selectedIds,
             onDownloadProgress: (e) => setDownloadProgress(e),
+        });
+    };
+
+    const handleDelete = () => {
+        deleteMutate({
+            shareFileIdList: selectedIds
         });
     };
 
@@ -99,20 +122,28 @@ const DownloadFilesDialog = ({
                             <Progress value={downloadProgress} />
                         </div>
                     )}
-                    {isError && (
-                        <div className="w-full mt-4">
-                            <div className="text-sm mb-1">error</div>
-                        </div>
-                    )}
                     <Button
                         onClick={handleDownload}
                         disabled={
                             selectedIds.length === 0 ||
                             downloadPending ||
-                            !downloadable
+                            !downloadable ||
+                            deletePending
                         }
                     >
                         İndir
+                    </Button>
+                    <Button
+                        variant={"destructive"}
+                        onClick={handleDelete}
+                        disabled={
+                            selectedIds.length === 0 ||
+                            downloadPending ||
+                            !downloadable ||
+                            deletePending
+                        }
+                    >
+                        Sil
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -120,4 +151,4 @@ const DownloadFilesDialog = ({
     );
 };
 
-export default DownloadFilesDialog;
+export default AdminDownloadFilesDialog;

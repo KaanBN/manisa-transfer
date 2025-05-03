@@ -2,7 +2,7 @@ import {ShareFileModel} from "@/models/shareFileModel.ts";
 import {UserModel} from "@/models/userModel.ts";
 
 export type DetailedShareModel = {
-    id: string;
+    id: number;
     recipient: UserModel;
     sender: UserModel;
     title: string;

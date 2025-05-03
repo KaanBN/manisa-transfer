@@ -2,7 +2,7 @@ import apiClient from "@/lib/axios.ts";
 
 type DownloadFileProps = {
     shareFileIdList: string[];
-    onDownloadProgress: (progress: number) => void;
+    onDownloadProgress?: (progress: number) => void;
 };
 
 export const downloadFiles = async ({ shareFileIdList, onDownloadProgress }: DownloadFileProps) => {

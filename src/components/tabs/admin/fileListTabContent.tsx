@@ -27,6 +27,10 @@ import {tr} from "date-fns/locale";
 import {UserModel} from "@/models/userModel.ts";
 import {Input} from "@/components/ui/input.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
+import AdminDeleteShareAlertDialog from "@/components/tabs/admin/adminDeleteShareAlertDialog.tsx";
+import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
+import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
+import AdminDownloadFilesDialog from "@/components/admin/adminDownloadFilesDialog.tsx";
 
 function FileListTabContent() {
     const [pagination, setPagination] = useState({
@@ -37,6 +41,9 @@ function FileListTabContent() {
     const previousSenderDebouncedRef = React.useRef<string | undefined>(undefined);
     const previousReceiverDebouncedRef = React.useRef<string | undefined>(undefined);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
+    const [selectedShare, setSelectedShare] = useState<DetailedShareModel | null>(null);
 
     const senderUsernameFilter = columnFilters.find((f) => f.id === "sender")?.value as string | undefined;
     const debouncedSenderUserName = useDebounce(senderUsernameFilter, 500);
@@ -50,6 +57,7 @@ function FileListTabContent() {
         senderUsername: debouncedSenderUserName,
         receiverUsername: debouncedReceiverUserName
     });
+    const { mutate: downloadMutate, isPending: isDownloadPending } = useDownloadFile();
 
     React.useEffect(() => {
         if (
@@ -165,7 +173,19 @@ function FileListTabContent() {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({  }) => {
+            cell: ({ row }) => {
+                const rowData = row.original;
+
+                const handleDownloadAllClick = () => {
+                    const shareFileIds = rowData.files.map((f) => f.id);
+
+                    downloadMutate({
+                        shareFileIdList: shareFileIds,
+                    });
+                };
+
+                const isExpired = new Date(rowData.expireTime).getTime() <= Date.now();
+
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -176,19 +196,26 @@ function FileListTabContent() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                onClick={() => {}}
+                                onClick={() => {
+                                    setDownloadDialogOpen(true);
+                                    setSelectedShare(rowData);
+                                }}
                             >
                                 Dosyaları Gör
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => {}}
+                                disabled={isExpired}
+                                onClick={() => handleDownloadAllClick()}
                             >
                                 İndir
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem
                                 variant={"destructive"}
-                                onClick={() => {}}
+                                onClick={() => {
+                                    setSelectedShare(rowData);
+                                    setDeleteDialogOpen(true);
+                                }}
                             >
                                 Sil
                             </DropdownMenuItem>
@@ -231,8 +258,6 @@ function FileListTabContent() {
     }
 
     return (
-
-
         <AdminTabDiv>
             <div className="pb-2 gap-2 flex flex-col md:flex-row">
                 <Input
@@ -306,6 +331,24 @@ function FileListTabContent() {
                     İleri
                 </Button>
             </div>
+
+            {selectedShare && (
+                <>
+                    <AdminDeleteShareAlertDialog
+                        open={deleteDialogOpen}
+                        onClose={() => {
+                            setDeleteDialogOpen(false);
+                        }}
+                        selectedShareId={selectedShare.id}
+                    />
+                    <AdminDownloadFilesDialog
+                        fileList={selectedShare.files}
+                        showFileListModal={downloadDialogOpen}
+                        setShowFileListModal={setDownloadDialogOpen}
+                        downloadable={new Date(selectedShare.expireTime).getTime() > Date.now()}
+                    />
+                </>
+            )}
         </AdminTabDiv>
     );
 }
