@@ -24,16 +24,23 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
-
+import UpdateUploadSizeDialog from "@/components/admin/updateUploadSizeDialog.tsx";
 
 function UserListTabContent() {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
     });
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<DetailedUserModel | null>(null);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+    const handleUpdateSize = (user: DetailedUserModel) => {
+        setSelectedUser(user);
+        setDialogOpen(true);
+    };
 
     const previousDebouncedRef = React.useRef<string | undefined>(undefined);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
@@ -93,27 +100,28 @@ function UserListTabContent() {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({  }) => {
+            cell: ({ row }) => {
+                const user = row.original;
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
                                 <MoreHorizontal />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                onClick={() => {}}
+                                onClick={() => handleUpdateSize(user)}
                             >
                                 Yükleme Kapasitesini Değiştir
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                )
+                );
             },
         },
     ], []);
+
 
     const table = useReactTable<DetailedUserModel>({
         data: data?.data ?? [],
@@ -212,6 +220,16 @@ function UserListTabContent() {
                     İleri
                 </Button>
             </div>
+
+            {selectedUser && (
+                <UpdateUploadSizeDialog
+                    open={dialogOpen}
+                    onClose={() => setDialogOpen(false)}
+                    defaultValue={selectedUser.maxUploadSize}
+                    selectedUser={selectedUser}
+                />
+            )}
+
         </AdminTabDiv>
     );
 }
