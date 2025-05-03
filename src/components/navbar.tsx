@@ -91,6 +91,13 @@ const Navbar: React.FC<Props> = ({setOpenDialog}) => {
                                 <DropdownMenuSeparator/>
                                 <DropdownMenuItem
                                     onClick={() => {
+                                        navigate("/");
+                                    }}
+                                >
+                                    Ana Sayfa
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => {
                                         setOpenDialog(true);
                                     }}
                                 >

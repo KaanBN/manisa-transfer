@@ -4,7 +4,7 @@ type Payload = {
     userName: string;
     displayName: string;
     password: string;
-    maxUploadSize: number;
+    maxUploadSize?: number | null;
     role: number;
 };
 

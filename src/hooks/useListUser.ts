@@ -8,5 +8,6 @@ export const useListUser = (name?: string) => {
         queryKey: ['listUser', name],
         queryFn: () => fetchUsers(name),
         staleTime: 5 * 60 * 1000,
+        enabled: !!name,
     });
 };

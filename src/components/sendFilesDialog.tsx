@@ -66,7 +66,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
     return (
         <>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
+                <DialogContent className={"max-h-[90vh] overflow-y-auto"}>
                     <DialogHeader>
                         <DialogTitle>Dosya Gönder</DialogTitle>
                     </DialogHeader>

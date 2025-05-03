@@ -17,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { useDebounce } from "@/hooks/useDebounce.ts";
 import { useListUser } from "@/hooks/useListUser.ts";
-import {UserModel} from "@/models/userModel.ts";
+import { UserModel } from "@/models/userModel.ts";
 
 export function UserSelect({
                                value,
@@ -30,7 +30,9 @@ export function UserSelect({
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
 
-    const { data, isLoading } = useListUser(debouncedSearch);
+    const shouldFetch = debouncedSearch.length >= 3;
+
+    const { data, isLoading } = useListUser(shouldFetch ? debouncedSearch : undefined);
     const users = data?.data || [];
 
     return (
@@ -51,13 +53,17 @@ export function UserSelect({
                 <PopoverContent align="start" side="top" className="p-0 w-full">
                     <Command className="max-h-full">
                         <CommandInput
-                            placeholder="Kullanıcı ara..."
+                            placeholder="Kullanıcı ara (en az 3 karakter)..."
                             className="h-9"
                             value={search}
                             onValueChange={setSearch}
                         />
                         <CommandList className="max-h-64 overflow-auto">
-                            {isLoading ? (
+                            {!shouldFetch ? (
+                                <div className="px-4 py-2 text-sm text-muted-foreground">
+                                    Aramak için en az 3 karakter girin.
+                                </div>
+                            ) : isLoading ? (
                                 <div className="px-4 py-2 text-sm text-muted-foreground">
                                     Yükleniyor...
                                 </div>

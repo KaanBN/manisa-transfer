@@ -72,7 +72,7 @@ const AdminDownloadFilesDialog = ({
 
     return (
         <Dialog open={showFileListModal} onOpenChange={setShowFileListModal}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className={"max-h-[90vh] overflow-y-auto"}>
                 <DialogHeader>
                     <DialogTitle>Dosyalar</DialogTitle>
                 </DialogHeader>

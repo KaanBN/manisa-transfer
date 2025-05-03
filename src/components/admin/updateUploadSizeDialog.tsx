@@ -51,7 +51,7 @@ const UpdateUploadSizeDialog = ({ open, onClose, defaultValue, selectedUser }: P
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent>
+            <DialogContent className={"max-h-[90vh] overflow-y-auto"}>
                 <DialogHeader>
                     <DialogTitle>Yükleme Kapasitesini Güncelle</DialogTitle>
                 </DialogHeader>

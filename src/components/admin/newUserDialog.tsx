@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import {
     Form,
-    FormControl,
+    FormControl, FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {useAdminCreateNewUser} from "@/hooks/admin/useAdminCreateNewUser.ts";
+import {useQueryClient} from "@tanstack/react-query";
 
 type Props = {
     open: boolean;
@@ -32,7 +33,9 @@ const formSchema = z.object({
     name: z.string().min(1, "İsim zorunludur."),
     username: z.string().min(1, "Kullanıcı adı zorunludur."),
     password: z.string().min(1, "Şifre zorunludur."),
-    max_upload_size: z.coerce.number().min(0, "Geçerli bir sayı girin."),
+    max_upload_size: z
+        .union([z.coerce.number().min(0, "Geçerli bir sayı girin."), z.literal(null)])
+        .optional(),
     role: z.enum(["user", "admin"], {
         required_error: "Rol seçimi zorunludur.",
     }),
@@ -46,10 +49,12 @@ export function NewUserDialog({ open, onClose }: Props) {
             name: "",
             username: "",
             password: "",
-            max_upload_size: 100,
+            max_upload_size: undefined,
             role: undefined,
         },
     });
+
+    const queryClient = useQueryClient();
 
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         console.log("Form values:", values);
@@ -65,14 +70,17 @@ export function NewUserDialog({ open, onClose }: Props) {
             role: roleAsNumber
         },{
             onSuccess: () => {
-                onClose();
+                queryClient.invalidateQueries({
+                    queryKey: ["adminUsers"]
+                }).then(() => {onClose();})
+
             }
         });
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className={"max-h-[90vh] overflow-y-auto"}>
                 <DialogHeader>
                     <DialogTitle>Yeni Kullanıcı</DialogTitle>
                     <DialogDescription>
@@ -137,8 +145,9 @@ export function NewUserDialog({ open, onClose }: Props) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Maksimum Yükleme Boyutu (byte)</FormLabel>
+                                    <FormDescription>Boş bırakılırsa sunucudaki değer verilecektir.</FormDescription>
                                     <FormControl>
-                                        <Input type="number" placeholder="100" {...field} />
+                                        <Input type="number" placeholder="100" {...field} value={field.value ?? undefined} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -161,14 +170,13 @@ export function NewUserDialog({ open, onClose }: Props) {
                                                 <SelectItem value="admin">Admin</SelectItem>
                                             </SelectContent>
                                         </Select>
-
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
 
-                        <DialogFooter>
+                        <DialogFooter className="mt-4">
                             <Button disabled={isPending} type="submit">{isPending ? "Yükleniyor" : "Kaydet"}</Button>
                         </DialogFooter>
                     </form>

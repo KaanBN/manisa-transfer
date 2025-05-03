@@ -12,7 +12,7 @@ type ShareLinkDialogProps = {
 const ShareLinkDialog = ({showLinkModal, setShowLinkModal, downloadLink } : ShareLinkDialogProps) => {
     return (
         <Dialog open={showLinkModal} onOpenChange={setShowLinkModal}>
-            <DialogContent>
+            <DialogContent className={"max-h-[90vh] overflow-y-auto"}>
                 <DialogHeader>
                     <DialogTitle>Paylaşım Bağlantısı</DialogTitle>
                 </DialogHeader>
