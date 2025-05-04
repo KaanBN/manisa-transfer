@@ -16,9 +16,9 @@ import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import UpdateUserDialog from "@/components/admin/updateUserDialog.tsx";
 import {toast} from "sonner";
 import NewUserDialog from "@/components/admin/newUserDialog.tsx";
+import {UpdateUserDialog} from "@/components/admin/updateUserDialog.tsx";
 
 const UserListPage = () => {
     const [pagination, setPagination] = useState({
