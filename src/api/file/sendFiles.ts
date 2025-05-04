@@ -8,7 +8,7 @@ type SendFilesPayload = {
     onProgress: (progress: number) => void;
 };
 
-export const sendFiles = async ({ title, message, receiverId, files, onProgress }: SendFilesPayload) => {
+export const sendFiles = async ({title, message, receiverId, files, onProgress}: SendFilesPayload) => {
     const formData = new FormData();
 
     formData.append("title", title);

@@ -6,26 +6,19 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import {
-    Form,
-    FormControl, FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { DetailedUserModel } from "@/models/admin/detailedUserModel.ts";
-import { useEffect, useState } from "react";
-import { useAdminUpdateUser } from "@/hooks/admin/useAdminUpdateUser.ts";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useQueryClient} from "@tanstack/react-query";
+import {toast} from "sonner";
+import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts";
+import {useEffect, useState} from "react";
+import {useAdminUpdateUser} from "@/hooks/admin/useAdminUpdateUser.ts";
 import {
     convertBetweenUnits,
     convertFromBytes,
@@ -56,8 +49,8 @@ const formSchema = z.object({
     }),
 });
 
-export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
-    const { mutate, isPending } = useAdminUpdateUser();
+export function UpdateUserDialog({open, onClose, selectedUser}: Props) {
+    const {mutate, isPending} = useAdminUpdateUser();
     const [sizeUnit, setSizeUnit] = useState<SizeUnit>("MB");
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -123,7 +116,9 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                 toast.success("Kullanıcı başarıyla güncellendi.");
                 queryClient.invalidateQueries({
                     queryKey: ["adminUsers"]
-                }).then(() => { onClose(); });
+                }).then(() => {
+                    onClose();
+                });
             }
         });
     };
@@ -143,13 +138,13 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                         <FormField
                             control={form.control}
                             name="name"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>İsim</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Kullanıcı İsmi" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -157,13 +152,13 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                         <FormField
                             control={form.control}
                             name="username"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Kullanıcı Adı</FormLabel>
                                     <FormControl>
                                         <Input placeholder="kullanici_adi" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -171,7 +166,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                         <FormField
                             control={form.control}
                             name="password"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Şifre</FormLabel>
                                     <FormDescription>
@@ -187,7 +182,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                                 value={field.value || ""}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </div>
                                 </FormItem>
                             )}
@@ -197,7 +192,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                             <FormField
                                 control={form.control}
                                 name="max_upload_size"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem className="flex-grow">
                                         <FormLabel>Maksimum Yükleme Boyutu</FormLabel>
                                         <FormControl>
@@ -208,7 +203,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                                 value={field.value ?? undefined}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -216,7 +211,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                             <FormField
                                 control={form.control}
                                 name="size_unit"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem className="w-24">
                                         <FormLabel>Birim</FormLabel>
                                         <Select
@@ -224,7 +219,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                             value={field.value}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder={sizeUnit} />
+                                                <SelectValue placeholder={sizeUnit}/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="B">B</SelectItem>
@@ -233,7 +228,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                                 <SelectItem value="GB">GB</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -242,13 +237,13 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                         <FormField
                             control={form.control}
                             name="role"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Rol</FormLabel>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Rol Seçin" />
+                                                <SelectValue placeholder="Rol Seçin"/>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value="user">Kullanıcı</SelectItem>
@@ -256,7 +251,7 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />

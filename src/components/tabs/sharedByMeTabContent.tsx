@@ -22,7 +22,7 @@ type SharedByMeTabContentProps = {
     onDataReady?: () => void;
 };
 
-const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentProps>(({ onDataReady }, ref) => {
+const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentProps>(({onDataReady}, ref) => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -34,7 +34,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error, isPlaceholderData } = useListSent({
+    const {data, isPending, isError, error, isPlaceholderData} = useListSent({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         username: debouncedUserName,
@@ -65,7 +65,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         }
     }, [data, isPlaceholderData, isPending]);
 
-    const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
+    const {mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
 
     const [showDialog, setShowDialog] = useState(false);
     const [selectedShare, setSelectedShare] = useState<ShareModel>();
@@ -74,17 +74,17 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         {
             accessorKey: "userName",
             header: "Gönderilen",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
+            cell: ({row}) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
             accessorKey: "title",
             header: "Başlık",
-            cell: ({ row }) => <div>{row.getValue("title")}</div>,
+            cell: ({row}) => <div>{row.getValue("title")}</div>,
         },
         {
             accessorKey: "uploadTime",
             header: "Gönderim Zamanı",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("uploadTime") as string;
                 const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
                     locale: tr,
@@ -95,7 +95,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         {
             accessorKey: "expireTime",
             header: "Kalan Zaman",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("expireTime") as string;
                 const targetTime = new Date(rawDate).getTime();
                 const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
@@ -128,7 +128,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         {
             accessorKey: "status",
             header: "Durum",
-            cell: ({ row }) =>{
+            cell: ({row}) => {
                 const status = row.getValue("status");
 
                 let translatedStatus;
@@ -154,7 +154,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         {
             id: "actions",
             header: "",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rowData = row.original;
 
                 const handleDownloadClick = () => {
@@ -182,7 +182,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                         {downloadPending ? (
                             <Label>{downloadProgress}%</Label>
                         ) : (
-                            <Download />
+                            <Download/>
                         )}
                     </Button>
                 );

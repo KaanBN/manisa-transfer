@@ -4,7 +4,7 @@ type ShareDeleteFileProps = {
     shareFileIdList: string[];
 };
 
-export const adminDeleteShareFile = async ({ shareFileIdList }: ShareDeleteFileProps) => {
+export const adminDeleteShareFile = async ({shareFileIdList}: ShareDeleteFileProps) => {
     const response = await apiClient.delete("/admin/share-files/delete",
         {
             data: shareFileIdList

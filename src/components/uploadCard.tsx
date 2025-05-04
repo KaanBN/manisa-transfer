@@ -1,11 +1,11 @@
-import { useState, useCallback, JSX } from "react";
-import { useDropzone } from "react-dropzone";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { CirclePlusIcon, Trash } from "lucide-react";
+import {JSX, useCallback, useState} from "react";
+import {useDropzone} from "react-dropzone";
+import {Card, CardContent, CardFooter} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {toast} from "sonner";
+import {CirclePlusIcon, Trash} from "lucide-react";
 import SendFilesDialog from "@/components/sendFilesDialog";
-import { Label } from "@/components/ui/label";
+import {Label} from "@/components/ui/label";
 
 interface FileItem {
     file: File;
@@ -39,7 +39,7 @@ const FileList = ({
                         variant="ghost"
                         onClick={() => onRemoveFile(index)}
                     >
-                        <Trash size={16} className="text-red-500 hover:text-red-700" />
+                        <Trash size={16} className="text-red-500 hover:text-red-700"/>
                     </Button>
                 </div>
             ))}
@@ -64,7 +64,7 @@ function UploadCard(): JSX.Element {
         setFiles(prev => prev.filter((_, i) => i !== index));
     }, []);
 
-    const { getRootProps, getInputProps } = useDropzone({
+    const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDropFiles,
         noClick: true,
         multiple: true,
@@ -88,20 +88,20 @@ function UploadCard(): JSX.Element {
         <Card className="lg:w-[17.5em] w-full max-h-[30em]">
             <div className="flex justify-center items-center gap-1 px-6">
                 <div {...getRootProps()}>
-                    <input {...getInputProps()} id="fileInput" />
+                    <input {...getInputProps()} id="fileInput"/>
                     <Button
                         className="h-full flex flex-col"
                         variant="outline"
                         onClick={() => document.getElementById("fileInput")?.click()}
                     >
-                        <CirclePlusIcon className="w-6 h-6" />
+                        <CirclePlusIcon className="w-6 h-6"/>
                         <Label>Dosya Yükle</Label>
                     </Button>
                 </div>
             </div>
 
             <CardContent className="h-full overflow-y-auto">
-                <FileList files={files} onRemoveFile={removeFile} />
+                <FileList files={files} onRemoveFile={removeFile}/>
             </CardContent>
 
             <CardFooter className="flex">

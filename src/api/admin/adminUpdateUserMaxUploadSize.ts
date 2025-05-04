@@ -1,9 +1,9 @@
 import apiClient from "@/lib/axios.ts";
 
 export const adminUpdateUserMaxUploadSize = async ({
-                                          userId,
-                                          maxUploadSize,
-                                      }: {
+                                                       userId,
+                                                       maxUploadSize,
+                                                   }: {
     userId: number;
     maxUploadSize: number;
 }) => {

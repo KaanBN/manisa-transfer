@@ -1,10 +1,10 @@
 import apiClient from "@/lib/axios.ts";
 
 export const fetchReceived = async ({
-                                    page,
-                                    pageSize,
-                                    username,
-                                }: {
+                                        page,
+                                        pageSize,
+                                        username,
+                                    }: {
     page: number;
     pageSize: number;
     username?: string;

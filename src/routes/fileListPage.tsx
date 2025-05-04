@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
 import {DetailedShareModel} from "@/models/admin/detailedShareModel.ts";
 import {useDebounce} from "@/hooks/useDebounce.ts";
@@ -11,7 +11,8 @@ import {tr} from "date-fns/locale";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem, DropdownMenuSeparator,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -43,13 +44,13 @@ const FileListPage = () => {
     const receiverUsernameFilter = columnFilters.find((f) => f.id === "recipient")?.value as string | undefined;
     const debouncedReceiverUserName = useDebounce(receiverUsernameFilter, 500);
 
-    const { data, isPending, isError, error, isPlaceholderData } = useAdminListFile({
+    const {data, isPending, isError, error, isPlaceholderData} = useAdminListFile({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         senderUsername: debouncedSenderUserName,
         receiverUsername: debouncedReceiverUserName
     });
-    const { mutate: downloadMutate } = useDownloadFile();
+    const {mutate: downloadMutate} = useDownloadFile();
 
     useEffect(() => {
         if (isError && error) {
@@ -76,7 +77,7 @@ const FileListPage = () => {
         {
             accessorKey: "sender",
             header: "Gönderen",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const user: UserModel = row.getValue("sender");
                 return (
                     <div className="font-medium">{user.displayName}</div>
@@ -86,7 +87,7 @@ const FileListPage = () => {
         {
             accessorKey: "recipient",
             header: "Alan",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const user: UserModel = row.getValue("recipient");
                 return (
                     <div className="font-medium">{user.displayName}</div>
@@ -96,12 +97,12 @@ const FileListPage = () => {
         {
             accessorKey: "title",
             header: "Başlık",
-            cell: ({ row }) => <div>{row.getValue("title")}</div>,
+            cell: ({row}) => <div>{row.getValue("title")}</div>,
         },
         {
             accessorKey: "uploadTime",
             header: "Gönderim Zamanı",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("uploadTime") as string;
                 const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
                     locale: tr,
@@ -112,7 +113,7 @@ const FileListPage = () => {
         {
             accessorKey: "expireTime",
             header: "Kalan Zaman",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("expireTime") as string;
                 const targetTime = new Date(rawDate).getTime();
                 const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
@@ -145,7 +146,7 @@ const FileListPage = () => {
         {
             accessorKey: "status",
             header: "Durum",
-            cell: ({ row }) =>{
+            cell: ({row}) => {
                 const status = row.getValue("status");
 
                 let translatedStatus;
@@ -171,7 +172,7 @@ const FileListPage = () => {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rowData = row.original;
 
                 const handleDownloadAllClick = () => {
@@ -189,7 +190,7 @@ const FileListPage = () => {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
                                 <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
+                                <MoreHorizontal/>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -242,7 +243,7 @@ const FileListPage = () => {
         return (
             <AdminTabDiv>
                 <div className="flex items-center justify-center h-full">
-                    <Spinner color={"#ff00ff"} />
+                    <Spinner color={"#ff00ff"}/>
                     <span className={"ml-2"}>Yükleniyor...</span>
                 </div>
             </AdminTabDiv>

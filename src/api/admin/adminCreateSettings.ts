@@ -1,9 +1,9 @@
 import apiClient from "@/lib/axios.ts";
 
 export const adminCreateSettings = async ({
-                                             key,
-                                             value
-                                         }: {
+                                              key,
+                                              value
+                                          }: {
     key: string;
     value: string;
 }) => {

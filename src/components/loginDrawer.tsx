@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import {
     Drawer,
     DrawerClose,
@@ -8,9 +8,9 @@ import {
     DrawerHeader,
     DrawerTitle
 } from "@/components/ui/drawer.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { login as loginApi } from "@/api/auth/login";
+import {Button} from "@/components/ui/button.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {login as loginApi} from "@/api/auth/login";
 import {useAuth} from "@/context/authContext.tsx";
 
 type LoginDrawerProps = {
@@ -18,8 +18,8 @@ type LoginDrawerProps = {
     setOpen: (open: boolean) => void;
 };
 
-const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
-    const { login } = useAuth();
+const LoginDrawer: React.FC<LoginDrawerProps> = ({open, setOpen}) => {
+    const {login} = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -33,7 +33,7 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
         setErrorMsg("");
 
         try {
-            const res = await loginApi({ username, password });
+            const res = await loginApi({username, password});
             login(res.data.token); // ✅ context login
             setOpen(false);
         } catch (err: any) {

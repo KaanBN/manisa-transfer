@@ -1,7 +1,7 @@
+import * as React from "react";
 import {useEffect, useState} from "react";
 import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts";
 import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
-import * as React from "react";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 import {useAdminListUser} from "@/hooks/admin/useAdminListUser.ts";
 import {
@@ -41,7 +41,7 @@ const UserListPage = () => {
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error, isPlaceholderData } = useAdminListUser({
+    const {data, isPending, isError, error, isPlaceholderData} = useAdminListUser({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         username: debouncedUserName,
@@ -70,17 +70,17 @@ const UserListPage = () => {
         {
             accessorKey: "displayName",
             header: "Görünen Ad",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("displayName")}</div>,
+            cell: ({row}) => <div className="font-medium">{row.getValue("displayName")}</div>,
         },
         {
             accessorKey: "userName",
             header: "Kullanıcı Adı",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
+            cell: ({row}) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
             accessorKey: "maxUploadSize",
             header: "Max Yükleme Kapasitesi",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const asd = formatFileSize(row.getValue("maxUploadSize"));
                 return (
                     <div className="font-medium">{asd}</div>
@@ -90,7 +90,7 @@ const UserListPage = () => {
         {
             accessorKey: "role",
             header: "Rol",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const encodedRole = row.getValue("role");
                 var role = "";
                 switch (encodedRole) {
@@ -107,13 +107,13 @@ const UserListPage = () => {
         {
             id: "actions",
             enableHiding: false,
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const user = row.original;
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
-                                <MoreHorizontal />
+                                <MoreHorizontal/>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -147,7 +147,7 @@ const UserListPage = () => {
         return (
             <AdminTabDiv>
                 <div className="flex items-center justify-center h-full">
-                    <Spinner color={"#ff00ff"} />
+                    <Spinner color={"#ff00ff"}/>
                     <span className={"ml-2"}>Yükleniyor...</span>
                 </div>
             </AdminTabDiv>
@@ -174,7 +174,9 @@ const UserListPage = () => {
                     className="max-w-sm"
                 />
 
-                <Button onClick={()=>{setNewUserDialogOpen(true)}}>
+                <Button onClick={() => {
+                    setNewUserDialogOpen(true)
+                }}>
                     <UserPlus/>
                     Yeni Kullanıcı
                 </Button>

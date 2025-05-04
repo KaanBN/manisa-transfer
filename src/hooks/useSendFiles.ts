@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {sendFiles} from "@/api/file/sendFiles.ts";
 import {toast} from "sonner";
 import {AxiosError} from "axios";

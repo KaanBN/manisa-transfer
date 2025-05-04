@@ -1,16 +1,17 @@
-import { Button } from "@/components/ui/button.tsx";
-import { Menubar } from "@radix-ui/react-menubar";
+import {Button} from "@/components/ui/button.tsx";
+import {Menubar} from "@radix-ui/react-menubar";
 import {
     MenubarContent,
     MenubarGroup,
-    MenubarItem, MenubarLabel,
+    MenubarItem,
+    MenubarLabel,
     MenubarMenu,
     MenubarSeparator,
     MenubarTrigger
 } from "./ui/menubar";
-import { useState } from "react";
+import {useState} from "react";
 import LoginDrawer from "@/components/loginDrawer.tsx";
-import { ThemeToggle } from "@/components/themeToggle.tsx";
+import {ThemeToggle} from "@/components/themeToggle.tsx";
 import {useAuth} from "@/context/authContext.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {EllipsisVertical} from "lucide-react";
@@ -20,7 +21,7 @@ type Props = {
 }
 
 const Navbar: React.FC<Props> = ({setOpenDialog}) => {
-    const { user, logout } = useAuth();
+    const {user, logout} = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -43,7 +44,7 @@ const Navbar: React.FC<Props> = ({setOpenDialog}) => {
                                     user?.role === "Admin" && (
                                         <>
                                             <MenubarLabel>Admin</MenubarLabel>
-                                            <MenubarSeparator />
+                                            <MenubarSeparator/>
                                             <MenubarGroup>
                                                 <MenubarItem
                                                     onClick={() => {
@@ -98,7 +99,7 @@ const Navbar: React.FC<Props> = ({setOpenDialog}) => {
                         <LoginDrawer open={loginDrawerOpen} setOpen={setLoginDrawerOpen}/>
                     </>
                 )}
-                <ThemeToggle />
+                <ThemeToggle/>
             </div>
         </nav>
     );

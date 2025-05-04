@@ -13,7 +13,7 @@ import SettingsDialog from "@/components/admin/settingsDialog.tsx";
 
 
 function App(): JSX.Element {
-    const { theme } = useTheme()
+    const {theme} = useTheme()
 
     const [settingDialogOpen, setSettingDialogOpen] = useState(false);
 
@@ -28,18 +28,18 @@ function App(): JSX.Element {
                 backgroundImage: `url(${theme === 'dark' ? bgDark : bg})`,
             }}
         >
-            <Toaster richColors={true} theme={theme} />
-            <Navbar setOpenDialog={setSettingDialogOpen} />
+            <Toaster richColors={true} theme={theme}/>
+            <Navbar setOpenDialog={setSettingDialogOpen}/>
             <SettingsDialog open={settingDialogOpen} onClose={handleClose}/>
 
             <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<HomePage/>}/>
 
                 <Route
                     path="/admin/users"
                     element={
                         <ProtectedRoute requiredRole="Admin">
-                            <UserListPage />
+                            <UserListPage/>
                         </ProtectedRoute>
                     }
                 />
@@ -48,12 +48,12 @@ function App(): JSX.Element {
                     path="/admin/files"
                     element={
                         <ProtectedRoute requiredRole="Admin">
-                            <FileListPage />
+                            <FileListPage/>
                         </ProtectedRoute>
                     }
                 />
 
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<Navigate to="/" replace/>}/>
             </Routes>
 
             <footer className="text-center text-xs text-white py-4">

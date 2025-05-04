@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {adminDeleteShares} from "@/api/admin/adminDeleteShares.ts";
 import {toast} from "sonner";
 import {AxiosError} from "axios";

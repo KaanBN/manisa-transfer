@@ -1,15 +1,6 @@
-import {JSX, useRef, useState, useEffect} from "react";
-import {
-    Card,
-    CardContent, CardFooter,
-    CardHeader,
-} from "@/components/ui/card";
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs";
+import {JSX, useEffect, useRef, useState} from "react";
+import {Card, CardContent, CardFooter, CardHeader,} from "@/components/ui/card";
+import {Tabs, TabsContent, TabsList, TabsTrigger,} from "@/components/ui/tabs";
 import SharedByMeTabContent from "@/components/tabs/sharedByMeTabContent.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import SharedWithMeTabContent from "@/components/tabs/sharedWithMeTabContent.tsx";

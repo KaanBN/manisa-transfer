@@ -1,10 +1,4 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog.tsx";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useEffect, useState} from "react";
@@ -28,11 +22,10 @@ const DownloadFilesDialog = ({
                              }: DownloadFilesDialogProps) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [downloadProgress, setDownloadProgress] = useState<number>(0);
-    const { mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
+    const {mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
 
     useEffect(() => {
-        if (!showFileListModal)
-        {
+        if (!showFileListModal) {
             setSelectedIds([]);
         }
     }, [showFileListModal]);
@@ -96,7 +89,7 @@ const DownloadFilesDialog = ({
                     {downloadPending && (
                         <div className="w-full mt-4">
                             <div className="text-sm mb-1">İndirme: %{downloadProgress}</div>
-                            <Progress value={downloadProgress} />
+                            <Progress value={downloadProgress}/>
                         </div>
                     )}
                     <Button

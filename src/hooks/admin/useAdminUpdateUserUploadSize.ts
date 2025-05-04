@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
-import { adminUpdateUserMaxUploadSize } from "@/api/admin/adminUpdateUserMaxUploadSize.ts";
+import {useMutation} from "@tanstack/react-query";
+import {adminUpdateUserMaxUploadSize} from "@/api/admin/adminUpdateUserMaxUploadSize.ts";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
 

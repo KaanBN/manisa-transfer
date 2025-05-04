@@ -1,19 +1,14 @@
-import React, { useState } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog.tsx";
-import { Pencil, Check, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, {useState} from "react";
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
+import {Check, Pencil, X} from "lucide-react";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
 import {useAdminFetchSettings} from "@/hooks/admin/useAdminFetchSettings.ts";
 import {useAdminUpdateSetting} from "@/hooks/admin/useAdminUpdateSetting.ts";
 import {useAdminCreateSetting} from "@/hooks/admin/useAdminCreateSetting.ts";
 
-const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
-    const { data: settings, isLoading } = useAdminFetchSettings();
+const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({open, onClose}) => {
+    const {data: settings, isLoading} = useAdminFetchSettings();
     const updateMutation = useAdminUpdateSetting();
     const createMutation = useAdminCreateSetting();
 
@@ -23,12 +18,12 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
 
     const handleEdit = (id: number, key: string, value: string) => {
         setEditingId(id);
-        setTempSettings(prev => ({ ...prev, [id]: { key, value } }));
+        setTempSettings(prev => ({...prev, [id]: {key, value}}));
     };
 
     const handleUpdate = (id: number) => {
         const updated = tempSettings[id];
-        updateMutation.mutate({ id: id, key: updated.key, value: updated.value  });
+        updateMutation.mutate({id: id, key: updated.key, value: updated.value});
         setEditingId(null);
     };
 
@@ -59,15 +54,15 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
                             <Input
                                 placeholder="Key"
                                 value={newSetting.key}
-                                onChange={e => setNewSetting({ ...newSetting, key: e.target.value })}
+                                onChange={e => setNewSetting({...newSetting, key: e.target.value})}
                             />
                             <Input
                                 placeholder="Value"
                                 value={newSetting.value}
-                                onChange={e => setNewSetting({ ...newSetting, value: e.target.value })}
+                                onChange={e => setNewSetting({...newSetting, value: e.target.value})}
                             />
-                            <Button size="icon" onClick={handleNewSettingAdd}><Check size={16} /></Button>
-                            <Button size="icon" onClick={handleNewSettingCancel}><X size={16} /></Button>
+                            <Button size="icon" onClick={handleNewSettingAdd}><Check size={16}/></Button>
+                            <Button size="icon" onClick={handleNewSettingCancel}><X size={16}/></Button>
                         </div>
                     )}
 
@@ -82,17 +77,20 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
                                         value={tempSettings[setting.id]?.value || ""}
                                         onChange={e => setTempSettings(prev => ({
                                             ...prev,
-                                            [setting.id]: { ...prev[setting.id], value: e.target.value }
+                                            [setting.id]: {...prev[setting.id], value: e.target.value}
                                         }))}
                                     />
-                                    <Button size="icon" onClick={() => handleUpdate(setting.id)}><Check size={16} /></Button>
-                                    <Button size="icon" onClick={handleCancelEdit}><X size={16} /></Button>
+                                    <Button size="icon" onClick={() => handleUpdate(setting.id)}><Check
+                                        size={16}/></Button>
+                                    <Button size="icon" onClick={handleCancelEdit}><X size={16}/></Button>
                                 </>
                             ) : (
                                 <>
                                     <span className="flex-1">{setting.key}</span>
                                     <span className="flex-1">{setting.value}</span>
-                                    <Button size="icon" onClick={() => handleEdit(setting.id, setting.key, setting.value)}><Pencil size={16} /></Button>
+                                    <Button size="icon"
+                                            onClick={() => handleEdit(setting.id, setting.key, setting.value)}><Pencil
+                                        size={16}/></Button>
                                 </>
                             )}
                         </div>

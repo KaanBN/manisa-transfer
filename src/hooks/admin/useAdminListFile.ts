@@ -1,14 +1,14 @@
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
-import { AxiosError } from "axios";
+import {AxiosError} from "axios";
 import {adminFetchFiles} from "@/api/admin/adminFetchFiles.ts";
 import {AdminFileListResponse} from "@/models/admin/adminFileListResponse.ts";
 
 export const useAdminListFile = ({
-                                pageIndex,
-                                pageSize,
-                                 senderUsername,
-                                 receiverUsername,
-                            }: {
+                                     pageIndex,
+                                     pageSize,
+                                     senderUsername,
+                                     receiverUsername,
+                                 }: {
     pageIndex: number;
     pageSize: number;
     senderUsername?: string;

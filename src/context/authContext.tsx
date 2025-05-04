@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { jwtDecode } from "jwt-decode";
+import {createContext, ReactNode, useContext, useEffect, useState} from "react";
+import {jwtDecode} from "jwt-decode";
 
 type JwtPayload = {
     userId: string;
@@ -28,7 +28,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-let logoutFn = () => {};
+let logoutFn = () => {
+};
 
 export const setLogoutFunction = (fn: () => void) => {
     logoutFn = fn;
@@ -36,7 +37,7 @@ export const setLogoutFunction = (fn: () => void) => {
 
 export const getLogoutFunction = () => logoutFn;
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({children}: { children: ReactNode }) => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 

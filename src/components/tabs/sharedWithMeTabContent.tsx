@@ -1,17 +1,11 @@
 import * as React from "react"
-import {
-    ColumnDef,
-    getCoreRowModel,
-    useReactTable,
-    flexRender,
-    ColumnFiltersState,
-} from "@tanstack/react-table"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx"
-import { Button } from "@/components/ui/button.tsx"
-import { Input } from "@/components/ui/input.tsx"
-import {forwardRef, useEffect, useImperativeHandle, useState} from "react";
-import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import {forwardRef, useEffect, useImperativeHandle, useState} from "react"
+import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
+import {Button} from "@/components/ui/button.tsx"
+import {Input} from "@/components/ui/input.tsx"
+import {format} from "date-fns";
+import {tr} from "date-fns/locale";
 import {Download} from "lucide-react";
 import {PaginationHandle} from "@/types/paginationHandle.ts";
 import {useListReceived} from "@/hooks/useListReceived.ts";
@@ -27,7 +21,7 @@ type SharedWithMeTabContentProps = {
     onDataReady?: () => void;
 };
 
-const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabContentProps>(({ onDataReady }, ref) => {
+const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabContentProps>(({onDataReady}, ref) => {
     const [pagination, setPagination] = useState({
         pageIndex: 0,
         pageSize: 10,
@@ -39,7 +33,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
-    const { data, isPending, isError, error, isPlaceholderData } = useListReceived({
+    const {data, isPending, isError, error, isPlaceholderData} = useListReceived({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         username: debouncedUserName,
@@ -70,7 +64,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         }
     }, [data, isPlaceholderData, isPending]);
 
-    const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
+    const {mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
 
     const [showDialog, setShowDialog] = useState(false);
     const [selectedShare, setSelectedShare] = useState<ShareModel>();
@@ -79,17 +73,17 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         {
             accessorKey: "userName",
             header: "Gönderen",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("userName")}</div>,
+            cell: ({row}) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
             accessorKey: "title",
             header: "Başlık",
-            cell: ({ row }) => <div>{row.getValue("title")}</div>,
+            cell: ({row}) => <div>{row.getValue("title")}</div>,
         },
         {
             accessorKey: "uploadTime",
             header: "Gönderim Zamanı",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("uploadTime") as string;
                 const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
                     locale: tr,
@@ -100,7 +94,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         {
             accessorKey: "expireTime",
             header: "Kalan Zaman",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rawDate = row.getValue("expireTime") as string;
                 const targetTime = new Date(rawDate).getTime();
                 const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
@@ -133,7 +127,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         {
             accessorKey: "status",
             header: "Durum",
-            cell: ({ row }) =>{
+            cell: ({row}) => {
                 const status = row.getValue("status");
 
                 let translatedStatus;
@@ -159,7 +153,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
         {
             id: "actions",
             header: "",
-            cell: ({ row }) => {
+            cell: ({row}) => {
                 const rowData = row.original;
 
                 const handleDownloadClick = () => {
@@ -187,7 +181,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
                         {downloadPending ? (
                             <Label>{downloadProgress}%</Label>
                         ) : (
-                            <Download />
+                            <Download/>
                         )}
                     </Button>
                 );

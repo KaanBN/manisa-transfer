@@ -1,4 +1,4 @@
-import { Button } from "./ui/button";
+import {Button} from "./ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "./ui/dialog";
 import {Input} from "@/components/ui/input.tsx";
 import {toast} from "sonner";
@@ -9,7 +9,7 @@ type ShareLinkDialogProps = {
     downloadLink: string;
 }
 
-const ShareLinkDialog = ({showLinkModal, setShowLinkModal, downloadLink } : ShareLinkDialogProps) => {
+const ShareLinkDialog = ({showLinkModal, setShowLinkModal, downloadLink}: ShareLinkDialogProps) => {
     return (
         <Dialog open={showLinkModal} onOpenChange={setShowLinkModal}>
             <DialogContent className={"max-h-[90vh] overflow-y-auto"}>

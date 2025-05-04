@@ -1,4 +1,3 @@
-
 export type DetailedUserModel = {
     id: number;
     displayName: string;

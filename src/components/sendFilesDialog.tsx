@@ -9,7 +9,7 @@ import {useSendFiles} from "@/hooks/useSendFiles.ts";
 import Spinner from "@/components/spinner.tsx";
 import {toast} from "sonner";
 import ShareLinkDialog from "@/components/shareLinkDialog.tsx";
-import { Progress } from "./ui/progress"
+import {Progress} from "./ui/progress"
 import {UserModel} from "@/models/userModel.ts";
 import {useAuth} from "@/context/authContext.tsx";
 
@@ -22,7 +22,7 @@ type SendFilesDialogProps = {
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, setFiles}) => {
     const {mutate: sendFiles, isPending} = useSendFiles();
-    const { isAuthenticated } = useAuth()
+    const {isAuthenticated} = useAuth()
 
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
     const [showLinkModal, setShowLinkModal] = useState(false);
@@ -77,7 +77,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                     {isPending && (
                         <div className="w-full py-2">
                             <Label>Yükleme Durumu</Label>
-                            <Progress value={uploadProgress} className="mt-1 h-3" />
+                            <Progress value={uploadProgress} className="mt-1 h-3"/>
                             <p className="text-sm mt-1 text-muted-foreground">{uploadProgress}%</p>
                         </div>
                     )}

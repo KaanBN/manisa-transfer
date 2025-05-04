@@ -9,7 +9,7 @@ interface UpdateUserParams {
     role?: number;
 }
 
-export const adminUpdateUser = async ({ id, userName, displayName, password, maxUploadSize, role }: UpdateUserParams) => {
+export const adminUpdateUser = async ({id, userName, displayName, password, maxUploadSize, role}: UpdateUserParams) => {
     const res = await apiClient.put(`/admin/user/update/${id}`, {
         userName,
         displayName,

@@ -17,12 +17,12 @@ type DeleteAlertDialogProps = {
     selectedShareId: number
 }
 
-const AdminDeleteShareAlertDialog = ({open, onClose, selectedShareId}:DeleteAlertDialogProps) => {
-    const { mutate, isPending } = useAdminDeleteShare();
+const AdminDeleteShareAlertDialog = ({open, onClose, selectedShareId}: DeleteAlertDialogProps) => {
+    const {mutate, isPending} = useAdminDeleteShare();
     const queryClient = useQueryClient();
 
     return (
-        <AlertDialog open={open} onOpenChange={onClose} >
+        <AlertDialog open={open} onOpenChange={onClose}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Silmek istediğinizden emin misiniz ?</AlertDialogTitle>
@@ -35,8 +35,8 @@ const AdminDeleteShareAlertDialog = ({open, onClose, selectedShareId}:DeleteAler
                     <AlertDialogAction
                         onClick={() => {
                             mutate({
-                                shareId: selectedShareId
-                            },
+                                    shareId: selectedShareId
+                                },
                                 {
                                     onSuccess: () => {
                                         toast.success("Başarıyla silindi.");

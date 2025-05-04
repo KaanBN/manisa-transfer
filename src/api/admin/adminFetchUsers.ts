@@ -1,10 +1,10 @@
 import apiClient from "@/lib/axios.ts";
 
 export const adminFetchUsers = async ({
-                                           page,
-                                           pageSize,
-                                           username,
-}: {
+                                          page,
+                                          pageSize,
+                                          username,
+                                      }: {
     page: number;
     pageSize: number;
     username?: string;
@@ -13,7 +13,7 @@ export const adminFetchUsers = async ({
         params: {
             page,
             pageSize,
-            name:  username,
+            name: username,
         },
     });
 

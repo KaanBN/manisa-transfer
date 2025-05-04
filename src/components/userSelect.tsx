@@ -1,23 +1,13 @@
-import { useState } from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-    Command,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Label } from "@/components/ui/label"
-import { useDebounce } from "@/hooks/useDebounce.ts";
-import { useListUser } from "@/hooks/useListUser.ts";
-import { UserModel } from "@/models/userModel.ts";
+import {useState} from "react"
+import {Check, ChevronsUpDown} from "lucide-react"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Command, CommandGroup, CommandInput, CommandItem, CommandList,} from "@/components/ui/command"
+import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import {Label} from "@/components/ui/label"
+import {useDebounce} from "@/hooks/useDebounce.ts";
+import {useListUser} from "@/hooks/useListUser.ts";
+import {UserModel} from "@/models/userModel.ts";
 
 export function UserSelect({
                                value,
@@ -32,7 +22,7 @@ export function UserSelect({
 
     const shouldFetch = debouncedSearch.length >= 3;
 
-    const { data, isLoading } = useListUser(shouldFetch ? debouncedSearch : undefined);
+    const {data, isLoading} = useListUser(shouldFetch ? debouncedSearch : undefined);
     const users = data?.data || [];
 
     return (
@@ -47,7 +37,7 @@ export function UserSelect({
                         className="w-full justify-between"
                     >
                         {value?.displayName || "Kullanıcı seçin..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" side="top" className="p-0 w-full">

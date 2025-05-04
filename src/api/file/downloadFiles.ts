@@ -5,7 +5,7 @@ type DownloadFileProps = {
     onDownloadProgress?: (progress: number) => void;
 };
 
-export const downloadFiles = async ({ shareFileIdList, onDownloadProgress }: DownloadFileProps) => {
+export const downloadFiles = async ({shareFileIdList, onDownloadProgress}: DownloadFileProps) => {
     const response = await apiClient.post("/files/download",
         shareFileIdList,
         {

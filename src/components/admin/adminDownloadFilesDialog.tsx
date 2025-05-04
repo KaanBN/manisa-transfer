@@ -1,10 +1,4 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog.tsx";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useEffect, useState} from "react";
@@ -24,20 +18,19 @@ type AdminDownloadFilesDialogProps = {
 };
 
 const AdminDownloadFilesDialog = ({
-                                 fileList,
-                                 showFileListModal,
-                                 setShowFileListModal,
-                                 downloadable = true
-                             }: AdminDownloadFilesDialogProps) => {
+                                      fileList,
+                                      showFileListModal,
+                                      setShowFileListModal,
+                                      downloadable = true
+                                  }: AdminDownloadFilesDialogProps) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [downloadProgress, setDownloadProgress] = useState<number>(0);
-    const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
-    const { mutate: deleteMutate, isPending: deletePending } = useAdminDeleteShareFile();
+    const {mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
+    const {mutate: deleteMutate, isPending: deletePending} = useAdminDeleteShareFile();
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        if (!showFileListModal)
-        {
+        if (!showFileListModal) {
             setSelectedIds([]);
         }
     }, [showFileListModal]);
@@ -69,8 +62,8 @@ const AdminDownloadFilesDialog = ({
 
     const handleDelete = () => {
         deleteMutate({
-            shareFileIdList: selectedIds
-        },
+                shareFileIdList: selectedIds
+            },
             {
                 onSuccess: () => {
                     toast.success("Başarıyla silindi.");
@@ -117,7 +110,7 @@ const AdminDownloadFilesDialog = ({
                     {downloadPending && (
                         <div className="w-full mt-4">
                             <div className="text-sm mb-1">İndirme: %{downloadProgress}</div>
-                            <Progress value={downloadProgress} />
+                            <Progress value={downloadProgress}/>
                         </div>
                     )}
                     <Button

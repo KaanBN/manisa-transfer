@@ -8,7 +8,7 @@ type Payload = {
     role: number;
 };
 
-export const adminCreateNewUser = async ({ userName, displayName, password, maxUploadSize, role }: Payload) => {
+export const adminCreateNewUser = async ({userName, displayName, password, maxUploadSize, role}: Payload) => {
     const res = await apiClient.post("/admin/user/create", {
         userName,
         displayName,
