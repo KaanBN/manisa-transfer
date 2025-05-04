@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { downloadFiles } from "@/api/file/downloadFiles";
 import {toast} from "sonner";
+import {AxiosError} from "axios";
 
 export const useDownloadFile = (onSuccess?: () => void) => {
     return useMutation({
@@ -8,8 +9,10 @@ export const useDownloadFile = (onSuccess?: () => void) => {
         onSuccess: () => {
             if (onSuccess) onSuccess();
         },
-        onError: () => {
-            toast.error("Dosya indirilirken hata oluştu.");
+        onError: (error) => {
+            const axiosError = error as AxiosError<{ message: string }>;
+            const errorMessage = axiosError.response?.data?.message || "Dosya indirilirken bir hata oluştu.";
+            toast.error(errorMessage);
         }
     });
 };

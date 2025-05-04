@@ -13,6 +13,8 @@ import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {Progress} from "@/components/ui/progress.tsx";
 import {useAdminDeleteShareFile} from "@/hooks/admin/useAdminDeleteShareFile.ts";
+import {toast} from "sonner";
+import {useQueryClient} from "@tanstack/react-query";
 
 type AdminDownloadFilesDialogProps = {
     showFileListModal: boolean;
@@ -31,6 +33,7 @@ const AdminDownloadFilesDialog = ({
     const [downloadProgress, setDownloadProgress] = useState<number>(0);
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
     const { mutate: deleteMutate, isPending: deletePending } = useAdminDeleteShareFile();
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (!showFileListModal)
@@ -67,7 +70,17 @@ const AdminDownloadFilesDialog = ({
     const handleDelete = () => {
         deleteMutate({
             shareFileIdList: selectedIds
-        });
+        },
+            {
+                onSuccess: () => {
+                    toast.success("Başarıyla silindi.");
+                    queryClient.invalidateQueries({
+                        queryKey: ["adminFiles"]
+                    }).then(() => {
+                        setShowFileListModal(false)
+                    })
+                }
+            });
     };
 
     return (

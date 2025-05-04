@@ -11,6 +11,7 @@ import {toast} from "sonner";
 import ShareLinkDialog from "@/components/shareLinkDialog.tsx";
 import { Progress } from "./ui/progress"
 import {UserModel} from "@/models/userModel.ts";
+import {useAuth} from "@/context/authContext.tsx";
 
 type SendFilesDialogProps = {
     open: boolean
@@ -21,6 +22,8 @@ type SendFilesDialogProps = {
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, setFiles}) => {
     const {mutate: sendFiles, isPending} = useSendFiles();
+    const { isAuthenticated } = useAuth()
+
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
     const [showLinkModal, setShowLinkModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserModel | undefined>();
@@ -90,7 +93,11 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                     {
                         !isPending && (
                             <form onSubmit={handleSubmit} className="grid gap-4 py-4 w-full">
-                                <UserSelect value={selectedUser} onChange={setSelectedUser}/>
+                                {
+                                    isAuthenticated && (
+                                        <UserSelect value={selectedUser} onChange={setSelectedUser}/>
+                                    )
+                                }
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="title">Başlık</Label>
