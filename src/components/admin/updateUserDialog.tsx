@@ -42,7 +42,10 @@ type Props = {
 
 const formSchema = z.object({
     name: z.string().min(1, "İsim zorunludur."),
-    username: z.string().min(1, "Kullanıcı adı zorunludur."),
+    username: z
+        .string()
+        .min(1, "Kullanıcı adı zorunludur.")
+        .regex(/^\S+$/, "Kullanıcı adında boşluk olamaz."),
     password: z.string().optional(),
     max_upload_size: z
         .union([z.coerce.number().min(0, "Geçerli bir sayı girin."), z.literal(null)])

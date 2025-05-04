@@ -35,8 +35,10 @@ type Props = {
 
 const formSchema = z.object({
     name: z.string().min(1, "İsim zorunludur."),
-    username: z.string().min(1, "Kullanıcı adı zorunludur."),
-    password: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
+    username: z
+        .string()
+        .min(1, "Kullanıcı adı zorunludur.")
+        .regex(/^\S+$/, "Kullanıcı adında boşluk olamaz."),    password: z.string().min(6, "Şifre en az 6 karakter olmalıdır."),
     max_upload_size: z
         .union([z.coerce.number().min(0, "Geçerli bir sayı girin."), z.literal(null)])
         .optional(),
@@ -56,7 +58,7 @@ export function NewUserDialog({ open, onClose }: Props) {
             name: "",
             username: "",
             password: "",
-            max_upload_size: 100,
+            max_upload_size: undefined,
             size_unit: "MB",
             role: "user",
         },
@@ -72,7 +74,6 @@ export function NewUserDialog({ open, onClose }: Props) {
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         const roleAsNumber = values.role === "admin" ? 1 : 0;
 
-        // Convert the upload size to bytes before sending to server
         const uploadSizeInBytes = convertToBytes(values.max_upload_size, values.size_unit as SizeUnit);
 
         mutate({
@@ -88,7 +89,7 @@ export function NewUserDialog({ open, onClose }: Props) {
                     queryKey: ["adminUsers"]
                 }).then(() => {
                     onClose();
-                    form.reset(); // Reset form after successful submission
+                    form.reset();
                 });
             },
             onError: (error) => {
@@ -98,8 +99,13 @@ export function NewUserDialog({ open, onClose }: Props) {
         });
     };
 
+    const handleClose = () => {
+        form.reset();
+        onClose();
+    }
+
     return (
-        <Dialog open={open} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className={"max-h-[90vh] max-w-[100vh] overflow-y-auto"}>
                 <DialogHeader>
                     <DialogTitle>Yeni Kullanıcı Ekle</DialogTitle>
