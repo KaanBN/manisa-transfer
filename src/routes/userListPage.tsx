@@ -16,7 +16,7 @@ import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import UpdateUploadSizeDialog from "@/components/admin/updateUploadSizeDialog.tsx";
+import UpdateUserDialog from "@/components/admin/updateUserDialog.tsx";
 import {toast} from "sonner";
 import NewUserDialog from "@/components/admin/newUserDialog.tsx";
 
@@ -30,7 +30,7 @@ const UserListPage = () => {
     const [selectedUser, setSelectedUser] = useState<DetailedUserModel | null>(null);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-    const handleUpdateSize = (user: DetailedUserModel) => {
+    const handleUpdateUser = (user: DetailedUserModel) => {
         setSelectedUser(user);
         setDialogOpen(true);
     };
@@ -112,9 +112,9 @@ const UserListPage = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                onClick={() => handleUpdateSize(user)}
+                                onClick={() => handleUpdateUser(user)}
                             >
-                                Yükleme Kapasitesini Değiştir
+                                Kullanıcıyı Güncelle
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -139,10 +139,12 @@ const UserListPage = () => {
 
     if (isPending) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <Spinner color={"#ff00ff"} />
-                <span className={"ml-2"}>Yükleniyor...</span>
-            </div>
+            <AdminTabDiv>
+                <div className="flex items-center justify-center h-full">
+                    <Spinner color={"#ff00ff"} />
+                    <span className={"ml-2"}>Yükleniyor...</span>
+                </div>
+            </AdminTabDiv>
         );
     }
 
@@ -227,10 +229,9 @@ const UserListPage = () => {
             </div>
 
             {selectedUser && (
-                <UpdateUploadSizeDialog
+                <UpdateUserDialog
                     open={dialogOpen}
                     onClose={() => setDialogOpen(false)}
-                    defaultValue={selectedUser.maxUploadSize}
                     selectedUser={selectedUser}
                 />
             )}

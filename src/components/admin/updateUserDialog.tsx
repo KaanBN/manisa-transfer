@@ -21,18 +21,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {useAdminCreateNewUser} from "@/hooks/admin/useAdminCreateNewUser.ts";
-import {useQueryClient} from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { DetailedUserModel } from "@/models/admin/detailedUserModel.ts";
+import { useEffect } from "react";
+import { useAdminUpdateUser } from "@/hooks/admin/useAdminUpdateUser.ts";
 
 type Props = {
     open: boolean;
     onClose: () => void;
+    selectedUser: DetailedUserModel;
 };
 
 const formSchema = z.object({
     name: z.string().min(1, "İsim zorunludur."),
     username: z.string().min(1, "Kullanıcı adı zorunludur."),
-    password: z.string().min(1, "Şifre zorunludur."),
+    password: z.string().optional(),
     max_upload_size: z
         .union([z.coerce.number().min(0, "Geçerli bir sayı girin."), z.literal(null)])
         .optional(),
@@ -41,14 +45,14 @@ const formSchema = z.object({
     }),
 });
 
-export function NewUserDialog({ open, onClose }: Props) {
-    const { mutate, isPending} = useAdminCreateNewUser();
+export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
+    const { mutate, isPending } = useAdminUpdateUser();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
             username: "",
-            password: "",
+            password: undefined,
             max_upload_size: undefined,
             role: undefined,
         },
@@ -56,32 +60,46 @@ export function NewUserDialog({ open, onClose }: Props) {
 
     const queryClient = useQueryClient();
 
+    // Update form when selected user changes
+    useEffect(() => {
+        if (selectedUser) {
+            form.reset({
+                name: selectedUser.displayName,
+                username: selectedUser.userName,
+                password: undefined, // Don't pre-fill password
+                max_upload_size: selectedUser.maxUploadSize,
+                role: selectedUser.role === 1 ? "admin" : "user",
+            });
+        }
+    }, [selectedUser, form]);
+
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         const roleAsNumber = values.role === "admin" ? 1 : 0;
 
         mutate({
+            id: selectedUser.id,
             userName: values.username,
             displayName: values.name,
-            password: values.password,
+            password: values.password || undefined,
             maxUploadSize: values.max_upload_size,
             role: roleAsNumber
-        },{
+        }, {
             onSuccess: () => {
+                toast.success("Kullanıcı başarıyla güncellendi.");
                 queryClient.invalidateQueries({
                     queryKey: ["adminUsers"]
-                }).then(() => {onClose();})
-
+                }).then(() => { onClose(); });
             }
         });
     };
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className={"max-h-[100vh] max-w-[100vh] overflow-y-auto"}>
+            <DialogContent className={"max-h-[90vh] max-w-[100vh] overflow-y-auto"}>
                 <DialogHeader>
-                    <DialogTitle>Yeni Kullanıcı</DialogTitle>
+                    <DialogTitle>Kullanıcı Düzenle</DialogTitle>
                     <DialogDescription>
-                        Yeni kullanıcı eklemek için gerekli alanları doldurun.
+                        Kullanıcı bilgilerini güncellemek için gerekli alanları düzenleyin.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -94,7 +112,7 @@ export function NewUserDialog({ open, onClose }: Props) {
                                 <FormItem>
                                     <FormLabel>İsim</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Yeni Kullanıcı" {...field} />
+                                        <Input placeholder="Kullanıcı İsmi" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -108,7 +126,7 @@ export function NewUserDialog({ open, onClose }: Props) {
                                 <FormItem>
                                     <FormLabel>Kullanıcı Adı</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="yeni_kullanici" {...field} />
+                                        <Input placeholder="kullanici_adi" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -121,6 +139,9 @@ export function NewUserDialog({ open, onClose }: Props) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Şifre</FormLabel>
+                                    <FormDescription>
+                                        Değiştirmek istemiyorsanız boş bırakın.
+                                    </FormDescription>
                                     <div className="relative">
                                         <FormControl>
                                             <Input
@@ -128,6 +149,7 @@ export function NewUserDialog({ open, onClose }: Props) {
                                                 type={"password"}
                                                 placeholder="••••••••"
                                                 className="pr-10"
+                                                value={field.value || ""}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -142,7 +164,6 @@ export function NewUserDialog({ open, onClose }: Props) {
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Maksimum Yükleme Boyutu (byte)</FormLabel>
-                                    <FormDescription>Boş bırakılırsa sunucudaki değer verilecektir.</FormDescription>
                                     <FormControl>
                                         <Input type="number" placeholder="100" {...field} value={field.value ?? undefined} />
                                     </FormControl>
@@ -158,7 +179,7 @@ export function NewUserDialog({ open, onClose }: Props) {
                                 <FormItem>
                                     <FormLabel>Rol</FormLabel>
                                     <FormControl>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Rol Seçin" />
                                             </SelectTrigger>
@@ -183,4 +204,4 @@ export function NewUserDialog({ open, onClose }: Props) {
     );
 }
 
-export default NewUserDialog;
+export default UpdateUserDialog;
