@@ -17,8 +17,9 @@ import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {toast} from "sonner";
-import NewUserDialog from "@/components/admin/newUserDialog.tsx";
 import {UpdateUserDialog} from "@/components/admin/updateUserDialog.tsx";
+import {NewUserDialog} from "@/components/admin/newUserDialog.tsx";
+import {formatFileSize} from "@/lib/byteConverterHelper.ts";
 
 const UserListPage = () => {
     const [pagination, setPagination] = useState({
@@ -79,7 +80,12 @@ const UserListPage = () => {
         {
             accessorKey: "maxUploadSize",
             header: "Max Yükleme Kapasitesi",
-            cell: ({ row }) => <div className="font-medium">{row.getValue("maxUploadSize")} bayt</div>,
+            cell: ({ row }) => {
+                const asd = formatFileSize(row.getValue("maxUploadSize"));
+                return (
+                    <div className="font-medium">{asd}</div>
+                )
+            },
         },
         {
             accessorKey: "role",

@@ -47,7 +47,7 @@ const formSchema = z.object({
     max_upload_size: z
         .union([z.coerce.number().min(0, "Geçerli bir sayı girin."), z.literal(null)])
         .optional(),
-    size_unit: z.enum(["B", "KB", "MB", "GB", "TB"] as const),
+    size_unit: z.enum(["B", "KB", "MB", "GB"] as const),
     role: z.enum(["user", "admin"], {
         required_error: "Rol seçimi zorunludur.",
     }),
@@ -228,7 +228,6 @@ export function UpdateUserDialog({ open, onClose, selectedUser }: Props) {
                                                 <SelectItem value="KB">KB</SelectItem>
                                                 <SelectItem value="MB">MB</SelectItem>
                                                 <SelectItem value="GB">GB</SelectItem>
-                                                <SelectItem value="TB">TB</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

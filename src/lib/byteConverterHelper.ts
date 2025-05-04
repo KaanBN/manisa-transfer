@@ -1,11 +1,10 @@
-export type SizeUnit = 'B' | 'KB' | 'MB' | 'GB' | 'TB';
+export type SizeUnit = 'B' | 'KB' | 'MB' | 'GB';
 
 export const UNIT_MULTIPLIERS: Record<SizeUnit, number> = {
     B: 1,
     KB: 1024,
     MB: 1024 * 1024,
-    GB: 1024 * 1024 * 1024,
-    TB: 1024 * 1024 * 1024 * 1024
+    GB: 1024 * 1024 * 1024
 };
 
 /**
@@ -63,7 +62,7 @@ export const formatFileSize = (bytes: number | null | undefined, decimalPlaces: 
     if (bytes === null || bytes === undefined) return '0 B';
     if (bytes === 0) return '0 B';
 
-    const units: SizeUnit[] = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const units: SizeUnit[] = ['B', 'KB', 'MB', 'GB'];
     let unitIndex = 0;
     let size = Math.abs(bytes);
 
@@ -83,7 +82,7 @@ export const formatFileSize = (bytes: number | null | undefined, decimalPlaces: 
 export const getBestUnit = (bytes: number | null | undefined): SizeUnit => {
     if (bytes === null || bytes === undefined || bytes === 0) return 'B';
 
-    const units: SizeUnit[] = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const units: SizeUnit[] = ['B', 'KB', 'MB', 'GB'];
     let unitIndex = 0;
     let size = Math.abs(bytes);
 
