@@ -5,18 +5,16 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog.tsx";
-import { Pencil, Trash2, Check, X, Plus } from "lucide-react";
+import { Pencil, Check, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {useAdminFetchSettings} from "@/hooks/admin/useAdminFetchSettings.ts";
 import {useAdminUpdateSetting} from "@/hooks/admin/useAdminUpdateSetting.ts";
-import {useAdminDeleteSetting} from "@/hooks/admin/useAdminDeleteSetting.ts";
 import {useAdminCreateSetting} from "@/hooks/admin/useAdminCreateSetting.ts";
 
 const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
     const { data: settings, isLoading } = useAdminFetchSettings();
     const updateMutation = useAdminUpdateSetting();
-    const deleteMutation = useAdminDeleteSetting();
     const createMutation = useAdminCreateSetting();
 
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -32,10 +30,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
         const updated = tempSettings[id];
         updateMutation.mutate({ id: id, key: updated.key, value: updated.value  });
         setEditingId(null);
-    };
-
-    const handleDelete = (id: number) => {
-        deleteMutation.mutate({ id });
     };
 
     const handleCancelEdit = () => {
@@ -59,12 +53,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
                     <DialogTitle>Ayarlar</DialogTitle>
                 </DialogHeader>
 
-                <div className="flex justify-end mb-4">
-                    <Button variant="outline" size="icon" onClick={() => setNewSetting({ key: "", value: "" })}>
-                        <Plus size={16} />
-                    </Button>
-                </div>
-
                 <div className="grid gap-4 py-4">
                     {newSetting && (
                         <div className="flex items-center gap-2">
@@ -87,13 +75,9 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
                         <div key={setting.id} className="flex items-center gap-2">
                             {editingId === setting.id ? (
                                 <>
-                                    <Input
-                                        value={tempSettings[setting.id]?.key || ""}
-                                        onChange={e => setTempSettings(prev => ({
-                                            ...prev,
-                                            [setting.id]: { ...prev[setting.id], key: e.target.value }
-                                        }))}
-                                    />
+                                    <span className="flex-1">{setting.key}</span>
+
+
                                     <Input
                                         value={tempSettings[setting.id]?.value || ""}
                                         onChange={e => setTempSettings(prev => ({
@@ -109,7 +93,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({ open
                                     <span className="flex-1">{setting.key}</span>
                                     <span className="flex-1">{setting.value}</span>
                                     <Button size="icon" onClick={() => handleEdit(setting.id, setting.key, setting.value)}><Pencil size={16} /></Button>
-                                    <Button size="icon" onClick={() => handleDelete(setting.id)}><Trash2 size={16} /></Button>
                                 </>
                             )}
                         </div>

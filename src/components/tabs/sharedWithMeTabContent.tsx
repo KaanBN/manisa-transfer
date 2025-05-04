@@ -18,7 +18,6 @@ import {useListReceived} from "@/hooks/useListReceived.ts";
 import Spinner from "@/components/spinner.tsx";
 import {ShareModel} from "@/models/shareModel.ts";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
-import {ShareFileModel} from "@/models/shareFileModel.ts";
 import DownloadFilesDialog from "@/components/downloadFilesDialog.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {useDebounce} from "@/hooks/useDebounce.ts";
@@ -74,7 +73,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
     const { mutate: downloadMutate, isPending: downloadPending } = useDownloadFile();
 
     const [showDialog, setShowDialog] = useState(false);
-    const [selectedFiles, setSelectedFiles] = useState<ShareFileModel[]>([]);
+    const [selectedShare, setSelectedShare] = useState<ShareModel>();
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
@@ -174,16 +173,13 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
                             onDownloadProgress: setDownloadProgress
                         });
                     } else {
-                        setSelectedFiles(rowData.files);
+                        setSelectedShare(rowData);
                         setShowDialog(true);
                     }
                 };
 
-                const isExpired = new Date(rowData.expireTime).getTime() <= Date.now();
-
                 return (
                     <Button
-                        disabled={isExpired}
                         variant="ghost"
                         size="sm"
                         onClick={handleDownloadClick}
@@ -197,7 +193,7 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
                 );
             }
         }
-    ], [setSelectedFiles, setShowDialog, downloadMutate]);
+    ], [setSelectedShare, setShowDialog, downloadMutate]);
 
     const table = useReactTable({
         data: data?.data ?? [],
@@ -284,11 +280,16 @@ const SharedWithMeTabContent = forwardRef<PaginationHandle, SharedWithMeTabConte
                 </Table>
             </div>
 
-            <DownloadFilesDialog
-                fileList={selectedFiles}
-                showFileListModal={showDialog}
-                setShowFileListModal={setShowDialog}
-            />
+            {
+                selectedShare && (
+                    <DownloadFilesDialog
+                        fileList={selectedShare.files}
+                        showFileListModal={showDialog}
+                        setShowFileListModal={setShowDialog}
+                        downloadable={new Date(selectedShare.expireTime).getTime() > Date.now()}
+                    />
+                )
+            }
         </div>
     );
 });

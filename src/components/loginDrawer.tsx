@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/drawer.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import Spinner from "@/components/spinner.tsx";
 import { login as loginApi } from "@/api/auth/login";
 import {useAuth} from "@/context/authContext.tsx";
 
@@ -74,10 +73,10 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({ open, setOpen }) => {
                         </div>
                         <DrawerFooter>
                             <Button type="submit" disabled={loading}>
-                                {loading ? <Spinner /> : "Giriş Yap"}
+                                {loading ? "Yükleniyor" : "Giriş Yap"}
                             </Button>
                             <DrawerClose asChild>
-                                <Button variant="outline" type="button">İptal</Button>
+                                <Button disabled={loading} variant="outline" type="button">İptal</Button>
                             </DrawerClose>
                         </DrawerFooter>
                     </form>
