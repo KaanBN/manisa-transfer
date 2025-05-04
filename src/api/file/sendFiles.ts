@@ -14,7 +14,7 @@ export const sendFiles = async ({title, message, receiverId, files, onProgress}:
     formData.append("title", title);
     formData.append("message", message);
     if (receiverId) {
-        formData.append("shareWithId", receiverId.toString());
+        formData.append("receiverId", receiverId.toString());
     }
 
     files.forEach((file) => {

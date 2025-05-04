@@ -86,7 +86,7 @@ export function NewUserDialog({open, onClose}: Props) {
                 });
             },
             onError: (error) => {
-                toast.error("Kullanıcı oluşturulurken bir hata oluştu.");
+                //toast.error("Kullanıcı oluşturulurken bir hata oluştu.");
                 console.error("Error creating user:", error);
             }
         });

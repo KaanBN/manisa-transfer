@@ -6,7 +6,7 @@ import {fetchUsers} from "@/api/users/fetchUsers.ts";
 export const useListUser = (name?: string) => {
     return useQuery<UserListResponse, AxiosError>({
         queryKey: ['listUser', name],
-        queryFn: () => fetchUsers(name),
+        queryFn: () => fetchUsers(),
         staleTime: 5 * 60 * 1000,
         enabled: !!name,
     });

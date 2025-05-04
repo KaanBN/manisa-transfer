@@ -32,8 +32,8 @@ const Navbar: React.FC<Props> = ({setOpenDialog}) => {
             <div className="navbar-container">
                 {user ? (
                     <Menubar>
-                        <MenubarMenu>
-                            <MenubarTrigger className="bg-accent text-accent-foreground cursor-pointer gap-2">
+                        <MenubarMenu >
+                            <MenubarTrigger className="bg-accent text-accent-foreground cursor-pointer gap-2 py-2">
                                 {user.fullName}
                                 {
                                     <EllipsisVertical size={14}/>

@@ -11,7 +11,6 @@ import UserListPage from "@/routes/userListPage.tsx";
 import FileListPage from "@/routes/fileListPage.tsx";
 import SettingsDialog from "@/components/admin/settingsDialog.tsx";
 
-
 function App(): JSX.Element {
     const {theme} = useTheme()
 
@@ -30,7 +29,12 @@ function App(): JSX.Element {
         >
             <Toaster richColors={true} theme={theme}/>
             <Navbar setOpenDialog={setSettingDialogOpen}/>
-            <SettingsDialog open={settingDialogOpen} onClose={handleClose}/>
+
+            {
+                settingDialogOpen && (
+                    <SettingsDialog open={settingDialogOpen} onClose={handleClose}/>
+                )
+            }
 
             <Routes>
                 <Route path="/" element={<HomePage/>}/>

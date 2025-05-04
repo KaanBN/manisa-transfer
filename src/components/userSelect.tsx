@@ -40,7 +40,7 @@ export function UserSelect({
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent align="start" side="top" className="p-0 w-full">
+                <PopoverContent align="start" className="p-0 w-full">
                     <Command className="max-h-full">
                         <CommandInput
                             placeholder="Kullanıcı ara (en az 3 karakter)..."

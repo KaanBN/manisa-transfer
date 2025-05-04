@@ -39,7 +39,7 @@ function UserFileTableCard(): JSX.Element {
             <Card className="flex flex-col overflow-y-auto lg:min-h-[75vh] 2xl:min-h-[770px] lg:max-h-[75vh]">
                 <CardHeader>
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="shared-with-me">Paylaşılanlar</TabsTrigger>
+                        <TabsTrigger value="shared-with-me">Aldıklarım</TabsTrigger>
                         <TabsTrigger value="shared-by-me">Paylaştıklarım</TabsTrigger>
                     </TabsList>
                 </CardHeader>

@@ -6,6 +6,7 @@ import {ShareFileModel} from "@/models/shareFileModel.ts";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {Progress} from "@/components/ui/progress.tsx";
+import {formatFileSize, getBestUnit} from "@/lib/byteConverterHelper.ts";
 
 type DownloadFilesDialogProps = {
     showFileListModal: boolean;
@@ -80,6 +81,11 @@ const DownloadFilesDialog = ({
                             <Label htmlFor={file.id} className="cursor-pointer">
                                 {file.fileName}
                             </Label>
+
+                            <Label htmlFor={file.id} className="text-xs text-muted-foreground">
+                                {formatFileSize(file.fileSize)}
+                            </Label>
+
                             <div
                                 className={`w-3 h-3 ml-auto rounded-full ${file.status == 0 ? "bg-red-600" : "bg-green-600"}`}/>
                         </div>
