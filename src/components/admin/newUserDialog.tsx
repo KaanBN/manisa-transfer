@@ -67,7 +67,7 @@ export function NewUserDialog({open, onClose}: Props) {
     const onSubmit = (values: z.infer<typeof formSchema>) => {
         const roleAsNumber = values.role === "admin" ? 1 : 0;
 
-        const uploadSizeInBytes = convertToBytes(values.max_upload_size, values.size_unit as SizeUnit);
+        const uploadSizeInBytes = convertToBytes(values.max_upload_size, sizeUnit);
 
         mutate({
             userName: values.username,
