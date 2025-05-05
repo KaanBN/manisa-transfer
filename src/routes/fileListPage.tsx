@@ -4,7 +4,6 @@ import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTabl
 import {DetailedShareModel} from "@/models/admin/detailedShareModel.ts";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 import {useAdminListFile} from "@/hooks/admin/useAdminListFile.ts";
-import {useDownloadFile} from "@/hooks/useDownloadFile.ts";
 import {UserModel} from "@/models/userModel.ts";
 import {format} from "date-fns";
 import {tr} from "date-fns/locale";
@@ -24,6 +23,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import AdminDeleteShareAlertDialog from "@/components/tabs/admin/adminDeleteShareAlertDialog.tsx";
 import AdminDownloadFilesDialog from "@/components/admin/adminDownloadFilesDialog.tsx";
 import {toast} from "sonner";
+import {useDownloadShare} from "@/hooks/useDownloadShare.ts";
 
 const FileListPage = () => {
     const [pagination, setPagination] = useState({
@@ -50,7 +50,8 @@ const FileListPage = () => {
         senderUsername: debouncedSenderUserName,
         receiverUsername: debouncedReceiverUserName
     });
-    const {mutate: downloadMutate} = useDownloadFile();
+    const { mutate: downloadShareMutate } = useDownloadShare();
+
 
     useEffect(() => {
         if (isError && error) {
@@ -176,11 +177,7 @@ const FileListPage = () => {
                 const rowData = row.original;
 
                 const handleDownloadAllClick = () => {
-                    const shareFileIds = rowData.files.map((f) => f.id);
-
-                    downloadMutate({
-                        shareFileIdList: shareFileIds,
-                    });
+                    downloadShareMutate({ shareId: rowData.id });
                 };
 
                 const isExpired = new Date(rowData.expireTime).getTime() <= Date.now();

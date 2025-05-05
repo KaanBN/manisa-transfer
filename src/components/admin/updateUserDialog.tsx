@@ -195,6 +195,7 @@ export function UpdateUserDialog({open, onClose, selectedUser}: Props) {
                                 render={({field}) => (
                                     <FormItem className="flex-grow">
                                         <FormLabel>Maksimum Yükleme Boyutu</FormLabel>
+                                        <FormDescription>Verilmezse sabit değer veri tabanından okunur</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -214,6 +215,7 @@ export function UpdateUserDialog({open, onClose, selectedUser}: Props) {
                                 render={({field}) => (
                                     <FormItem className="w-24">
                                         <FormLabel>Birim</FormLabel>
+                                        <FormDescription>&nbsp;</FormDescription>
                                         <Select
                                             onValueChange={(value) => handleUnitChange(value as SizeUnit)}
                                             value={field.value}
