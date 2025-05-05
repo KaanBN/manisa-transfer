@@ -8,6 +8,8 @@ export const adminFetchFiles = async ({
                                           title,
                                           senderUsername,
                                           receiverUsername,
+                                          sortBy,
+                                          sortOrder
                                       }: {
     page: number;
     pageSize: number;
@@ -16,6 +18,8 @@ export const adminFetchFiles = async ({
     title?: string;
     senderUsername?: string;
     receiverUsername?: string;
+    sortBy?: string;
+    sortOrder?: string;
 }) => {
     const res = await apiClient.get("/admin/shares/list", {
         params: {
@@ -25,7 +29,9 @@ export const adminFetchFiles = async ({
             toTime,
             title,
             senderUsername,
-            receiverUsername
+            receiverUsername,
+            sortBy,
+            sortOrder
         },
     });
 

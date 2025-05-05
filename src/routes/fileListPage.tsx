@@ -1,6 +1,13 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable} from "@tanstack/react-table";
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    SortingState,
+    useReactTable
+} from "@tanstack/react-table";
 import {DetailedShareModel} from "@/models/admin/detailedShareModel.ts";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 import {useAdminListFile} from "@/hooks/admin/useAdminListFile.ts";
@@ -15,7 +22,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {MoreHorizontal} from "lucide-react";
+import {ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal} from "lucide-react";
 import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -33,6 +40,8 @@ const FileListPage = () => {
     });
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
+
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
     const [selectedShare, setSelectedShare] = useState<DetailedShareModel | null>(null);
@@ -52,14 +61,19 @@ const FileListPage = () => {
     } | undefined;
     const debouncedUploadTime = useDebounce(uploadTimeFilter, 100);
 
+    const sortBy = sorting[0]?.id;
+    const sortOrder = sorting[0]?.desc ? "desc" : "asc";
+
     const {data, isPending, isError, error} = useAdminListFile({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
         fromTime: debouncedUploadTime?.from,
         toTime: debouncedUploadTime?.to,
-        title: debouncedTitle,
+        title: debouncedTitle?.trim() ? debouncedTitle : undefined,
         senderUsername: debouncedSenderUserName,
-        receiverUsername: debouncedReceiverUserName
+        receiverUsername: debouncedReceiverUserName,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
     });
     const { mutate: downloadShareMutate } = useDownloadShare();
 
@@ -72,7 +86,7 @@ const FileListPage = () => {
     const columns = React.useMemo<ColumnDef<DetailedShareModel>[]>(() => [
         {
             accessorKey: "sender",
-            header: () => (
+            header: ({}) => (
                 <TextColumnFilter
                     columnId="sender"
                     label="Gönderen"
@@ -94,7 +108,7 @@ const FileListPage = () => {
         },
         {
             accessorKey: "recipient",
-            header: () => (
+            header: ({}) => (
                 <TextColumnFilter
                     columnId="recipient"
                     label="Alan"
@@ -116,17 +130,19 @@ const FileListPage = () => {
         },
         {
             accessorKey: "title",
-            header: () => (
+            header: ({column}) => (
                 <TextColumnFilter
                     columnId="title"
                     label="Başlık"
                     value={titleFilter}
-                    onChange={(val) =>
-                        setColumnFilters((prev) => {
-                            const others = prev.filter((f) => f.id !== "title");
-                            return [...others, { id: "title", value: val }];
-                        })
-                    }
+                    onChange={(val) => {
+                        const others = columnFilters.filter(f => f.id !== "title");
+                        setColumnFilters([...others, { id: "title", value: val }]);
+                    }}
+                    sortDirection={column.getIsSorted()}
+                    onSortChange={() => {
+                        column.toggleSorting();
+                    }}
                 />
             ),
             cell: ({row}) => {
@@ -137,11 +153,15 @@ const FileListPage = () => {
         },
         {
             accessorKey: "uploadTime",
-            header: () => {
+            header: ({column}) => {
                 return (
                     <MonthYearRangePicker
                         onCallback={(dateRange)=>{
                             table.getColumn("uploadTime")?.setFilterValue(dateRange)
+                        }}
+                        sortDirection={column.getIsSorted()}
+                        onSortChange={() => {
+                            column.toggleSorting();
                         }}
                     />
 
@@ -157,8 +177,23 @@ const FileListPage = () => {
         },
         {
             accessorKey: "expireTime",
-            header: "Kalan Zaman",
-            cell: ({row}) => {
+            enableSorting: true,
+            header: ({ column }) => {
+                const sort = column.getIsSorted();
+                return (
+                    <Button
+                        variant="ghost"
+                        className="p-0 flex items-center gap-1"
+                        onClick={() => column.toggleSorting()}
+                    >
+                        Kalan Zaman
+                        {sort === "asc" && <ArrowUp className="w-4 h-4" />}
+                        {sort === "desc" && <ArrowDown className="w-4 h-4" />}
+                        {!sort &&  <ArrowUpDown className="w-4 h-4" />}
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
                 const rawDate = row.getValue("expireTime") as string;
                 const targetTime = new Date(rawDate).getTime();
                 const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
@@ -167,7 +202,6 @@ const FileListPage = () => {
                     const interval = setInterval(() => {
                         setTimeLeft(targetTime - Date.now());
                     }, 1000);
-
                     return () => clearInterval(interval);
                 }, [targetTime]);
 
@@ -180,17 +214,32 @@ const FileListPage = () => {
 
                 return (
                     <span>
-                        {days > 0 && `${days}g `}
+                {days > 0 && `${days}g `}
                         {hours.toString().padStart(2, "0")}:
                         {minutes.toString().padStart(2, "0")}:
                         {seconds.toString().padStart(2, "0")}
-                    </span>
+            </span>
                 );
             },
         },
         {
             accessorKey: "status",
-            header: "Durum",
+            enableSorting: true,
+            header: ({ column }) => {
+                const sort = column.getIsSorted();
+                return (
+                    <Button
+                        variant="ghost"
+                        className="p-0 flex items-center gap-1"
+                        onClick={() => column.toggleSorting()}
+                    >
+                        Durum
+                        {sort === "asc" && <ArrowUp className="w-4 h-4" />}
+                        {sort === "desc" && <ArrowDown className="w-4 h-4" />}
+                        {!sort &&  <ArrowUpDown className="w-4 h-4" />}
+                    </Button>
+                );
+            },
             cell: ({row}) => {
                 const status = row.getValue("status");
 
@@ -282,16 +331,21 @@ const FileListPage = () => {
         data: data?.data ?? [],
         columns,
         manualPagination: true,
+        manualFiltering: true,
+        manualSorting: true,
         pageCount: Math.ceil((data?.totalRowCount ?? 0) / pagination.pageSize),
         state: {
             pagination,
             columnFilters,
+            sorting,
         },
         onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
-        manualFiltering: true
     });
+
+
 
     if (isPending) {
         return (

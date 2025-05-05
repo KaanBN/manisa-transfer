@@ -48,16 +48,21 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({open,
                                     <>
                                         <Input
                                             type={isNumber ? "number" : "text"}
+                                            step={isNumber ? "1" : undefined}
+                                            inputMode={isNumber ? "numeric" : undefined}
+                                            pattern={isNumber ? "\\d*" : undefined}
                                             value={tempSettings[setting.id]?.value || ""}
-                                            onChange={e =>
+                                            onChange={e => {
+                                                const newValue = e.target.value;
+                                                if (isNumber && !/^\d*$/.test(newValue)) return; // sadece rakam (tam sayı) kabul et
                                                 setTempSettings(prev => ({
                                                     ...prev,
                                                     [setting.id]: {
                                                         ...prev[setting.id],
-                                                        value: e.target.value
+                                                        value: newValue
                                                     }
-                                                }))
-                                            }
+                                                }));
+                                            }}
                                         />
                                         <div className="flex gap-2 mt-2">
                                             <Button size="icon" onClick={() => handleUpdate(setting.id)}>

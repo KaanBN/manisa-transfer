@@ -1,9 +1,15 @@
 import * as React from "react"
 import {forwardRef, useEffect, useImperativeHandle, useState} from "react"
-import {ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, useReactTable,} from "@tanstack/react-table"
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    SortingState,
+    useReactTable,
+} from "@tanstack/react-table"
 
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx"
-import {Input} from "@/components/ui/input.tsx"
 import {PaginationHandle} from "@/types/paginationHandle.ts";
 import {useListSent} from "@/hooks/useListSent.ts";
 import Spinner from "@/components/spinner.tsx";
@@ -14,9 +20,11 @@ import {format} from "date-fns";
 import {tr} from "date-fns/locale";
 import {Button} from "@/components/ui/button.tsx";
 import {Label} from "@/components/ui/label.tsx";
-import {Download} from "lucide-react";
+import {ArrowDown, ArrowUp, ArrowUpDown, Download} from "lucide-react";
 import {useDebounce} from "@/hooks/useDebounce.ts";
 import {toast} from "sonner";
+import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
+import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
 
 type SharedByMeTabContentProps = {
     onDataReady?: () => void;
@@ -29,15 +37,33 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     });
     const previousDebouncedRef = React.useRef<string | undefined>(undefined);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [downloadProgress, setDownloadProgress] = useState(0)
+    const [downloadProgress, setDownloadProgress] = useState(0);
+    const [sorting, setSorting] = useState<SortingState>([]);
 
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
 
+    const titleFilter = columnFilters.find((f) => f.id === "title")?.value as string | undefined;
+    const debouncedTitle = useDebounce(titleFilter, 500);
+
+    const uploadTimeFilter = columnFilters.find((f) => f.id === "uploadTime")?.value as {
+        from: string;
+        to: string;
+    } | undefined;
+    const debouncedUploadTime = useDebounce(uploadTimeFilter, 100);
+
+    const sortBy = sorting[0]?.id;
+    const sortOrder = sorting[0]?.desc ? "desc" : "asc";
+
     const {data, isPending, isError, error, isPlaceholderData} = useListSent({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        username: debouncedUserName,
+        fromTime: debouncedUploadTime?.from,
+        toTime: debouncedUploadTime?.to,
+        title: debouncedTitle?.trim() ? debouncedTitle : undefined,
+        username: debouncedUserName?.trim() ? debouncedUserName : undefined,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
     });
 
     useEffect(() => {
@@ -73,17 +99,53 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
             accessorKey: "userName",
-            header: "Gönderilen",
-            cell: ({row}) => <div className="font-medium">{row.getValue("userName")}</div>,
+            header: ({}) => (
+                <TextColumnFilter
+                    columnId="userName"
+                    label="Gönderen"
+                    value={userNameFilter}
+                    onChange={(val) =>
+                        setColumnFilters((prev) => {
+                            const others = prev.filter((f) => f.id !== "userName");
+                            return [...others, { id: "userName", value: val }];
+                        })
+                    }
+                />
+            ),            cell: ({row}) => <div className="font-medium">{row.getValue("userName")}</div>,
         },
         {
             accessorKey: "title",
-            header: "Başlık",
+            header: ({}) => (
+                <TextColumnFilter
+                    columnId="title"
+                    label="Başlık"
+                    value={titleFilter}
+                    onChange={(val) =>
+                        setColumnFilters((prev) => {
+                            const others = prev.filter((f) => f.id !== "title");
+                            return [...others, { id: "title", value: val }];
+                        })
+                    }
+                />
+            ),
             cell: ({row}) => <div>{row.getValue("title")}</div>,
         },
         {
             accessorKey: "uploadTime",
-            header: "Gönderim Zamanı",
+            header: ({column}) => {
+                return (
+                    <MonthYearRangePicker
+                        onCallback={(dateRange)=>{
+                            table.getColumn("uploadTime")?.setFilterValue(dateRange)
+                        }}
+                        sortDirection={column.getIsSorted()}
+                        onSortChange={() => {
+                            column.toggleSorting();
+                        }}
+                    />
+
+                )
+            },
             cell: ({row}) => {
                 const rawDate = row.getValue("uploadTime") as string;
                 const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
@@ -94,8 +156,23 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         },
         {
             accessorKey: "expireTime",
-            header: "Kalan Zaman",
-            cell: ({row}) => {
+            enableSorting: true,
+            header: ({ column }) => {
+                const sort = column.getIsSorted();
+                return (
+                    <Button
+                        variant="ghost"
+                        className="p-0 flex items-center gap-1"
+                        onClick={() => column.toggleSorting()}
+                    >
+                        Kalan Zaman
+                        {sort === "asc" && <ArrowUp className="w-4 h-4" />}
+                        {sort === "desc" && <ArrowDown className="w-4 h-4" />}
+                        {!sort &&  <ArrowUpDown className="w-4 h-4" />}
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
                 const rawDate = row.getValue("expireTime") as string;
                 const targetTime = new Date(rawDate).getTime();
                 const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
@@ -104,7 +181,6 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                     const interval = setInterval(() => {
                         setTimeLeft(targetTime - Date.now());
                     }, 1000);
-
                     return () => clearInterval(interval);
                 }, [targetTime]);
 
@@ -117,17 +193,32 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
 
                 return (
                     <span>
-                        {days > 0 && `${days}g `}
+                {days > 0 && `${days}g `}
                         {hours.toString().padStart(2, "0")}:
                         {minutes.toString().padStart(2, "0")}:
                         {seconds.toString().padStart(2, "0")}
-                    </span>
+            </span>
                 );
             },
         },
         {
             accessorKey: "status",
-            header: "Durum",
+            enableSorting: true,
+            header: ({ column }) => {
+                const sort = column.getIsSorted();
+                return (
+                    <Button
+                        variant="ghost"
+                        className="p-0 flex items-center gap-1"
+                        onClick={() => column.toggleSorting()}
+                    >
+                        Durum
+                        {sort === "asc" && <ArrowUp className="w-4 h-4" />}
+                        {sort === "desc" && <ArrowDown className="w-4 h-4" />}
+                        {!sort &&  <ArrowUpDown className="w-4 h-4" />}
+                    </Button>
+                );
+            },
             cell: ({row}) => {
                 const status = row.getValue("status");
 
@@ -194,13 +285,17 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
         data: data?.data ?? [],
         columns,
         manualPagination: true,
+        manualFiltering: true,
+        manualSorting: true,
         pageCount: Math.ceil((data?.totalRowCount ?? 0) / pagination.pageSize),
         state: {
             pagination,
             columnFilters,
+            sorting,
         },
         onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
     });
 
@@ -230,16 +325,6 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
 
     return (
         <div className="w-full h-full flex flex-col">
-            <div className="py-4">
-                <Input
-                    placeholder="Gönderilene göre filtrele..."
-                    value={userNameFilter ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("userName")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
-            </div>
             <div className="flex-1 overflow-y-auto rounded-md border">
                 <Table>
                     <TableHeader>

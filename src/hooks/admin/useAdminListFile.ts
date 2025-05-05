@@ -11,6 +11,8 @@ export const useAdminListFile = ({
                                      title,
                                      senderUsername,
                                      receiverUsername,
+                                     sortOrder,
+                                     sortBy,
                                  }: {
     pageIndex: number;
     pageSize: number;
@@ -19,9 +21,11 @@ export const useAdminListFile = ({
     title?: string;
     senderUsername?: string;
     receiverUsername?: string;
+    sortOrder?: string;
+    sortBy?: string;
 }) => {
     return useQuery<AdminFileListResponse, AxiosError, AdminFileListResponse>({
-        queryKey: ["adminFiles", pageIndex, pageSize, fromTime, toTime, title, senderUsername, receiverUsername],
+        queryKey: ["adminFiles", pageIndex, pageSize, fromTime, toTime, title, senderUsername, receiverUsername, sortOrder, sortBy],
         queryFn: () =>
             adminFetchFiles({
                 page: pageIndex + 1,
@@ -30,7 +34,9 @@ export const useAdminListFile = ({
                 toTime: toTime,
                 title: title,
                 senderUsername: senderUsername,
-                receiverUsername: receiverUsername
+                receiverUsername: receiverUsername,
+                sortOrder: sortOrder,
+                sortBy: sortBy
             }),
         placeholderData: keepPreviousData,
     });
