@@ -3,11 +3,17 @@ import apiClient from "@/lib/axios.ts";
 export const adminFetchFiles = async ({
                                           page,
                                           pageSize,
+                                          fromTime,
+                                          toTime,
+                                          title,
                                           senderUsername,
                                           receiverUsername,
                                       }: {
     page: number;
     pageSize: number;
+    fromTime?: string;
+    toTime?: string;
+    title?: string;
     senderUsername?: string;
     receiverUsername?: string;
 }) => {
@@ -15,6 +21,9 @@ export const adminFetchFiles = async ({
         params: {
             page,
             pageSize,
+            fromTime,
+            toTime,
+            title,
             senderUsername,
             receiverUsername
         },

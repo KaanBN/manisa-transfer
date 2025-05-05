@@ -11,4 +11,5 @@ export type DetailedShareModel = {
     uploadTime: string;
     expireTime: string;
     files: ShareFileModel[];
+    downloadLink: string;
 };

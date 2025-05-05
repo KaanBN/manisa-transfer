@@ -39,7 +39,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({open,
                     {!isLoading && settings?.data.map(setting => {
                         const isEditing = editingId === setting.id;
                         const isNumber = setting.type === "Number" || setting.type === "number";
-                        const isByteField = setting.key === "user_default_max_upload_size";
 
                         return (
                             <div key={setting.id} className="flex flex-col gap-1 border p-3 rounded-md">
@@ -60,9 +59,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({open,
                                                 }))
                                             }
                                         />
-                                        {isByteField && (
-                                            <span className="text-sm text-muted-foreground">Byte</span>
-                                        )}
                                         <div className="flex gap-2 mt-2">
                                             <Button size="icon" onClick={() => handleUpdate(setting.id)}>
                                                 <Check size={16} />
@@ -75,9 +71,6 @@ const SettingsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({open,
                                 ) : (
                                     <>
                                         <span className="text-sm text-muted-foreground break-all">{setting.value}</span>
-                                        {isByteField && (
-                                            <span className="text-sm text-muted-foreground">Byte</span>
-                                        )}
                                         <div className="flex gap-2 mt-2">
                                             <Button size="icon" onClick={() => handleEdit(setting.id, setting.value)}>
                                                 <Pencil size={16} />

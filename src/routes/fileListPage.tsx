@@ -18,12 +18,13 @@ import {Button} from "@/components/ui/button.tsx";
 import {MoreHorizontal} from "lucide-react";
 import Spinner from "@/components/spinner.tsx";
 import AdminTabDiv from "@/components/admin/adminTabCard.tsx";
-import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import AdminDeleteShareAlertDialog from "@/components/tabs/admin/adminDeleteShareAlertDialog.tsx";
 import AdminDownloadFilesDialog from "@/components/admin/adminDownloadFilesDialog.tsx";
 import {toast} from "sonner";
 import {useDownloadShare} from "@/hooks/useDownloadShare.ts";
+import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
+import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
 
 const FileListPage = () => {
     const [pagination, setPagination] = useState({
@@ -31,8 +32,6 @@ const FileListPage = () => {
         pageSize: 10,
     });
 
-    const previousSenderDebouncedRef = React.useRef<string | undefined>(undefined);
-    const previousReceiverDebouncedRef = React.useRef<string | undefined>(undefined);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
@@ -44,14 +43,25 @@ const FileListPage = () => {
     const receiverUsernameFilter = columnFilters.find((f) => f.id === "recipient")?.value as string | undefined;
     const debouncedReceiverUserName = useDebounce(receiverUsernameFilter, 500);
 
-    const {data, isPending, isError, error, isPlaceholderData} = useAdminListFile({
+    const titleFilter = columnFilters.find((f) => f.id === "title")?.value as string | undefined;
+    const debouncedTitle = useDebounce(titleFilter, 500);
+
+    const uploadTimeFilter = columnFilters.find((f) => f.id === "uploadTime")?.value as {
+        from: string;
+        to: string;
+    } | undefined;
+    const debouncedUploadTime = useDebounce(uploadTimeFilter, 100);
+
+    const {data, isPending, isError, error} = useAdminListFile({
         pageIndex: pagination.pageIndex,
         pageSize: pagination.pageSize,
+        fromTime: debouncedUploadTime?.from,
+        toTime: debouncedUploadTime?.to,
+        title: debouncedTitle,
         senderUsername: debouncedSenderUserName,
         receiverUsername: debouncedReceiverUserName
     });
     const { mutate: downloadShareMutate } = useDownloadShare();
-
 
     useEffect(() => {
         if (isError && error) {
@@ -59,25 +69,22 @@ const FileListPage = () => {
         }
     }, [isError]);
 
-    React.useEffect(() => {
-        if (
-            !isPlaceholderData &&
-            previousSenderDebouncedRef.current !== debouncedSenderUserName &&
-            previousReceiverDebouncedRef.current !== debouncedReceiverUserName
-        ) {
-            previousSenderDebouncedRef.current = debouncedSenderUserName;
-            previousReceiverDebouncedRef.current = debouncedReceiverUserName;
-            setPagination((prev) => ({
-                ...prev,
-                pageIndex: 0,
-            }));
-        }
-    }, [debouncedSenderUserName, debouncedReceiverUserName, isPlaceholderData]);
-
     const columns = React.useMemo<ColumnDef<DetailedShareModel>[]>(() => [
         {
             accessorKey: "sender",
-            header: "Gönderen",
+            header: () => (
+                <TextColumnFilter
+                    columnId="sender"
+                    label="Gönderen"
+                    value={senderUsernameFilter}
+                    onChange={(val) =>
+                        setColumnFilters((prev) => {
+                            const others = prev.filter((f) => f.id !== "sender");
+                            return [...others, { id: "sender", value: val }];
+                        })
+                    }
+                />
+            ),
             cell: ({row}) => {
                 const user: UserModel = row.getValue("sender");
                 return (
@@ -87,7 +94,19 @@ const FileListPage = () => {
         },
         {
             accessorKey: "recipient",
-            header: "Alan",
+            header: () => (
+                <TextColumnFilter
+                    columnId="recipient"
+                    label="Alan"
+                    value={receiverUsernameFilter}
+                    onChange={(val) =>
+                        setColumnFilters((prev) => {
+                            const others = prev.filter((f) => f.id !== "recipient");
+                            return [...others, { id: "recipient", value: val }];
+                        })
+                    }
+                />
+            ),
             cell: ({row}) => {
                 const user: UserModel = row.getValue("recipient");
                 return (
@@ -97,12 +116,37 @@ const FileListPage = () => {
         },
         {
             accessorKey: "title",
-            header: "Başlık",
-            cell: ({row}) => <div>{row.getValue("title")}</div>,
+            header: () => (
+                <TextColumnFilter
+                    columnId="title"
+                    label="Başlık"
+                    value={titleFilter}
+                    onChange={(val) =>
+                        setColumnFilters((prev) => {
+                            const others = prev.filter((f) => f.id !== "title");
+                            return [...others, { id: "title", value: val }];
+                        })
+                    }
+                />
+            ),
+            cell: ({row}) => {
+                return (
+                    <div className="font-medium">{row.getValue("title")}</div>
+                )
+            },
         },
         {
             accessorKey: "uploadTime",
-            header: "Gönderim Zamanı",
+            header: () => {
+                return (
+                    <MonthYearRangePicker
+                        onCallback={(dateRange)=>{
+                            table.getColumn("uploadTime")?.setFilterValue(dateRange)
+                        }}
+                    />
+
+                )
+            },
             cell: ({row}) => {
                 const rawDate = row.getValue("uploadTime") as string;
                 const formatted = format(new Date(rawDate), "d MMMM yyyy, HH:mm", {
@@ -200,6 +244,18 @@ const FileListPage = () => {
                                 Dosyaları Gör
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                                onClick={() => {
+                                    navigator.clipboard.writeText(rowData.downloadLink);
+                                    toast.message(
+                                        <a href={rowData.downloadLink} target="_blank" rel="noopener noreferrer" className="underline">
+                                            {rowData.downloadLink}
+                                        </a>
+                                    );
+                                }}
+                            >
+                                İndirme Linkini kopyala
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                                 disabled={isExpired}
                                 onClick={() => handleDownloadAllClick()}
                             >
@@ -234,6 +290,7 @@ const FileListPage = () => {
         onPaginationChange: setPagination,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
+        manualFiltering: true
     });
 
     if (isPending) {
@@ -259,25 +316,6 @@ const FileListPage = () => {
 
     return (
         <AdminTabDiv>
-            <div className="pb-2 gap-2 flex flex-col md:flex-row">
-                <Input
-                    placeholder="Gönderene göre filtrele..."
-                    value={senderUsernameFilter ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("sender")?.setFilterValue(event.target.value)
-                    }
-                    className="w-full"
-                />
-                <Input
-                    placeholder="Alana göre filtrele..."
-                    value={receiverUsernameFilter ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("recipient")?.setFilterValue(event.target.value)
-                    }
-                    className="w-full"
-                />
-            </div>
-
             <div className="flex-1 overflow-y-auto rounded-md border">
                 <Table>
                     <TableHeader>

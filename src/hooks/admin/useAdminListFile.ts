@@ -6,22 +6,31 @@ import {AdminFileListResponse} from "@/models/admin/adminFileListResponse.ts";
 export const useAdminListFile = ({
                                      pageIndex,
                                      pageSize,
+                                     fromTime,
+                                     toTime,
+                                     title,
                                      senderUsername,
                                      receiverUsername,
                                  }: {
     pageIndex: number;
     pageSize: number;
+    fromTime?: string;
+    toTime?: string;
+    title?: string;
     senderUsername?: string;
     receiverUsername?: string;
 }) => {
     return useQuery<AdminFileListResponse, AxiosError, AdminFileListResponse>({
-        queryKey: ["adminFiles", pageIndex, pageSize, senderUsername, receiverUsername],
+        queryKey: ["adminFiles", pageIndex, pageSize, fromTime, toTime, title, senderUsername, receiverUsername],
         queryFn: () =>
             adminFetchFiles({
                 page: pageIndex + 1,
-                pageSize,
-                senderUsername,
-                receiverUsername
+                pageSize: pageSize,
+                fromTime: fromTime,
+                toTime: toTime,
+                title: title,
+                senderUsername: senderUsername,
+                receiverUsername: receiverUsername
             }),
         placeholderData: keepPreviousData,
     });
