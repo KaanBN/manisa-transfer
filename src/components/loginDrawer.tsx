@@ -34,7 +34,7 @@ const LoginDrawer: React.FC<LoginDrawerProps> = ({open, setOpen}) => {
 
         try {
             const res = await loginApi({username, password});
-            login(res.data.token); // ✅ context login
+            login(res.data.token);
             setOpen(false);
         } catch (err: any) {
             setErrorMsg(err?.response?.data?.message || "Giriş sırasında hata oluştu.");

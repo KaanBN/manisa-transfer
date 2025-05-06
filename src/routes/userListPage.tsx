@@ -171,7 +171,7 @@ const UserListPage = () => {
                     onChange={(event) =>
                         table.getColumn("userName")?.setFilterValue(event.target.value)
                     }
-                    className="max-w-sm"
+                    className="w-full  sm:max-w-sm mb-2 sm:mb-0"
                 />
 
                 <Button onClick={() => {

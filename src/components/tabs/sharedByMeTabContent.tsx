@@ -102,7 +102,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
             header: ({}) => (
                 <TextColumnFilter
                     columnId="userName"
-                    label="Gönderen"
+                    label="Alan"
                     value={userNameFilter}
                     onChange={(val) =>
                         setColumnFilters((prev) => {
