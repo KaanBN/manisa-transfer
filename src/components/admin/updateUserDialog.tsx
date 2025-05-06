@@ -19,13 +19,7 @@ import {toast} from "sonner";
 import {DetailedUserModel} from "@/models/admin/detailedUserModel.ts";
 import {useEffect, useState} from "react";
 import {useAdminUpdateUser} from "@/hooks/admin/useAdminUpdateUser.ts";
-import {
-    convertBetweenUnits,
-    convertFromBytes,
-    convertToBytes,
-    getBestUnit,
-    SizeUnit
-} from "@/lib/byteConverterHelper.ts";
+import {convertFromBytes, convertToBytes, getBestUnit, SizeUnit} from "@/lib/byteConverterHelper.ts";
 
 type Props = {
     open: boolean;
@@ -88,11 +82,9 @@ export function UpdateUserDialog({open, onClose, selectedUser}: Props) {
 
     const handleUnitChange = (newUnit: SizeUnit) => {
         const currentValue = form.getValues("max_upload_size");
-        const currentUnit = form.getValues("size_unit") as SizeUnit;
 
         if (currentValue !== undefined && currentValue !== null) {
-            const newValue = convertBetweenUnits(currentValue, currentUnit, newUnit);
-            form.setValue("max_upload_size", newValue);
+            form.setValue("max_upload_size", currentValue);
         }
 
         form.setValue("size_unit", newUnit);

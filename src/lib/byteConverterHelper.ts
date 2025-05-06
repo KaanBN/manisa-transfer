@@ -93,20 +93,3 @@ export const getBestUnit = (bytes: number | null | undefined): SizeUnit => {
 
     return units[unitIndex];
 };
-
-/**
- * Parses a human-readable file size string into bytes
- * @param sizeStr A string like "15 MB" or "1.5GB"
- * @returns The size in bytes, or undefined if the format is invalid
- */
-export const parseSizeString = (sizeStr: string): number | undefined => {
-    const normalized = sizeStr.replace(/\s+/g, '').toUpperCase();
-
-    const match = normalized.match(/^(\d*\.?\d+)([KMGT]?B)?$/);
-    if (!match) return undefined;
-
-    const value = parseFloat(match[1]);
-    const unit = (match[2] || 'B') as SizeUnit;
-
-    return convertToBytes(value, unit);
-};

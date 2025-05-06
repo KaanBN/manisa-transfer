@@ -292,18 +292,22 @@ const FileListPage = () => {
                             >
                                 Dosyaları Gör
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    navigator.clipboard.writeText(rowData.downloadLink);
-                                    toast.message(
-                                        <a href={rowData.downloadLink} target="_blank" rel="noopener noreferrer" className="underline">
-                                            {rowData.downloadLink}
-                                        </a>
-                                    );
-                                }}
-                            >
-                                İndirme Linkini kopyala
-                            </DropdownMenuItem>
+                            {
+                                rowData.recipient.id == -99 && (
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(rowData.downloadLink);
+                                            toast.message(
+                                                <a href={rowData.downloadLink} target="_blank" rel="noopener noreferrer" className="underline">
+                                                    {rowData.downloadLink}
+                                                </a>
+                                            );
+                                        }}
+                                    >
+                                        İndirme Linkini kopyala
+                                    </DropdownMenuItem>
+                                )
+                            }
                             <DropdownMenuItem
                                 disabled={isExpired}
                                 onClick={() => handleDownloadAllClick()}

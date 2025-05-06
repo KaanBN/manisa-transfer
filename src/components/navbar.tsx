@@ -68,6 +68,7 @@ const Navbar: React.FC<Props> = ({setOpenDialog}) => {
                                                 onClick={() => {
                                                     navigate("/");
                                                 }}
+                                                className={location.pathname == "/" ? "bg-primary/10 focus:bg-primary/30 text-primary" : ""}
                                             >
                                                 Ana Sayfa
                                             </MenubarItem>
