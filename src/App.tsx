@@ -1,6 +1,7 @@
 import {JSX, useState} from 'react';
 import bg from './assets/images/background.png';
 import bgDark from './assets/images/background-dark.png';
+import bgVideo from './assets/videos/background.mp4';
 import Navbar from "@/components/navbar";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import {useTheme} from "@/context/themeProvider.tsx";
@@ -10,9 +11,11 @@ import ProtectedRoute from "@/routes/protectedRoute.tsx";
 import UserListPage from "@/routes/userListPage.tsx";
 import FileListPage from "@/routes/fileListPage.tsx";
 import SettingsDialog from "@/components/admin/settingsDialog.tsx";
+import {useAuth} from "@/context/authContext.tsx";
 
 function App(): JSX.Element {
     const {theme} = useTheme()
+    const {isAuthenticated} = useAuth()
 
     const [settingDialogOpen, setSettingDialogOpen] = useState(false);
 
@@ -21,24 +24,38 @@ function App(): JSX.Element {
     }
 
     return (
-        <div
-            className="flex flex-col min-h-screen bg-cover bg-no-repeat"
-            style={{
-                backgroundImage: `url(${theme === 'dark' ? bgDark : bg})`,
-            }}
-        >
+        <div className="relative flex flex-col min-h-screen overflow-hidden">
+            {!isAuthenticated ? (
+                <>
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover z-[-2]"
+                        src={bgVideo}
+                    />
+                    <div className="absolute inset-0 bg-[#00000080] z-[-1]" />
+                </>
+
+            ) : (
+                <div
+                    className="absolute inset-0 bg-cover bg-no-repeat z-[-1]"
+                    style={{
+                        backgroundImage: `url(${theme === 'dark' ? bgDark : bg})`,
+                    }}
+                />
+            )}
+
             <Toaster richColors={true} theme={theme}/>
             <Navbar setOpenDialog={setSettingDialogOpen}/>
 
-            {
-                settingDialogOpen && (
-                    <SettingsDialog open={settingDialogOpen} onClose={handleClose}/>
-                )
-            }
+            {settingDialogOpen && (
+                <SettingsDialog open={settingDialogOpen} onClose={handleClose}/>
+            )}
 
             <Routes>
                 <Route path="/" element={<HomePage/>}/>
-
                 <Route
                     path="/admin/users"
                     element={
@@ -47,7 +64,6 @@ function App(): JSX.Element {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route
                     path="/admin/files"
                     element={
@@ -56,11 +72,10 @@ function App(): JSX.Element {
                         </ProtectedRoute>
                     }
                 />
-
                 <Route path="*" element={<Navigate to="/" replace/>}/>
             </Routes>
 
-            <footer className="text-center text-xs text-white py-4">
+            <footer className="text-center text-xs text-white py-4 z-10">
                 © {new Date().getFullYear()} Spiltech. Tüm hakları saklıdır.
             </footer>
         </div>
