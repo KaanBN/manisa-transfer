@@ -216,8 +216,6 @@ export function UpdateUserDialog({open, onClose, selectedUser}: Props) {
                                                 <SelectValue placeholder={sizeUnit}/>
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="B">B</SelectItem>
-                                                <SelectItem value="KB">KB</SelectItem>
                                                 <SelectItem value="MB">MB</SelectItem>
                                                 <SelectItem value="GB">GB</SelectItem>
                                             </SelectContent>

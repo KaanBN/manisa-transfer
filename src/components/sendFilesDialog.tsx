@@ -12,12 +12,18 @@ import ShareLinkDialog from "@/components/shareLinkDialog.tsx";
 import {Progress} from "./ui/progress"
 import {UserModel} from "@/models/userModel.ts";
 import {useAuth} from "@/context/authContext.tsx";
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 type SendFilesDialogProps = {
     open: boolean
     setOpen: (open: boolean) => void
     files: File[]
     setFiles: (files: File[]) => void
+}
+
+type DurationOption = {
+    label: string;
+    value: string;
 }
 
 const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, setFiles}) => {
@@ -30,6 +36,14 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
     const [title, setTitle] = useState("")
     const [message, setMessage] = useState("")
     const [uploadProgress, setUploadProgress] = useState<number>(0);
+    const [duration, setDuration] = useState("")
+    const durations: DurationOption[] = [
+        { label: "1 Gün", value: "1" },
+        { label: "2 Gün", value: "2" },
+        { label: "3 Gün", value: "3" },
+        { label: "1 Hafta", value: "7" },
+        { label: "1 Ay", value: "30" }
+    ]
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -45,6 +59,7 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                 files: files,
                 receiverId: selectedUser?.id,
                 onProgress: (e) => setUploadProgress(e),
+                expireOption: duration
             },
             {
                 onSuccess: (resData) => {
@@ -121,6 +136,28 @@ const SendFilesDialog: React.FC<SendFilesDialogProps> = ({open, setOpen, files, 
                                         required
                                     />
                                 </div>
+
+                                {
+                                    isAuthenticated && (
+                                        <div className="grid gap-2">
+                                            <Label>Süre</Label>
+                                            <Select value={duration} onValueChange={setDuration}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Saklanacak süre" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        {durations.map((item) => (
+                                                            <SelectItem key={item.value} value={item.value}>
+                                                                {item.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    )
+                                }
 
                                 <DialogFooter>
                                     <Button type="submit" disabled={isPending}>

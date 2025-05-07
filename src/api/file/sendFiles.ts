@@ -6,15 +6,19 @@ type SendFilesPayload = {
     receiverId?: number;
     files: File[];
     onProgress: (progress: number) => void;
+    expireOption?:  string;
 };
 
-export const sendFiles = async ({title, message, receiverId, files, onProgress}: SendFilesPayload) => {
+export const sendFiles = async ({title, message, receiverId, files, onProgress, expireOption}: SendFilesPayload) => {
     const formData = new FormData();
 
     formData.append("title", title);
     formData.append("message", message);
     if (receiverId) {
         formData.append("receiverId", receiverId.toString());
+    }
+    if (expireOption) {
+        formData.append("expireOption", expireOption);
     }
 
     files.forEach((file) => {
