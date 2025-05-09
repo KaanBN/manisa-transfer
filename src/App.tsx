@@ -1,4 +1,4 @@
-import {JSX, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import bg from './assets/images/background.png';
 import bgDark from './assets/images/background-dark.png';
 import bgVideo from './assets/videos/background.mp4';
@@ -12,10 +12,11 @@ import UserListPage from "@/routes/userListPage.tsx";
 import FileListPage from "@/routes/fileListPage.tsx";
 import SettingsDialog from "@/components/admin/settingsDialog.tsx";
 import {useAuth} from "@/context/authContext.tsx";
+import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
 
 function App(): JSX.Element {
     const {theme} = useTheme()
-    const {isAuthenticated} = useAuth()
+    const {isAuthenticated, isTwoFaDialogOpen, checkTwoFaDialog} = useAuth()
 
     const [settingDialogOpen, setSettingDialogOpen] = useState(false);
 
@@ -23,6 +24,9 @@ function App(): JSX.Element {
         setSettingDialogOpen(false);
     }
 
+    useEffect(() => {
+        checkTwoFaDialog()
+    }, []);
     return (
         <div className="relative flex flex-col min-h-screen overflow-hidden">
             {!isAuthenticated ? (
@@ -46,6 +50,14 @@ function App(): JSX.Element {
                     }}
                 />
             )}
+
+            {
+                isTwoFaDialogOpen && (() => {
+                    return (
+                        <TwoFactorDialog open={isTwoFaDialogOpen} />
+                    )
+                })()
+            }
 
             <Toaster richColors={true} theme={theme}/>
             <Navbar setOpenDialog={setSettingDialogOpen}/>

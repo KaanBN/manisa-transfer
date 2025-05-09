@@ -1,9 +1,10 @@
 import UploadCard from "@/components/uploadCard.tsx";
 import UserFileTableCard from "@/components/userFileTableCard.tsx";
 import {useAuth} from "@/context/authContext.tsx";
+import {useEffect} from "react";
 
 const HomePage = () => {
-    const {isAuthenticated} = useAuth()
+    const {isAuthenticated, twoFaState} = useAuth()
 
     return (
         <main className="flex flex-col lg:flex-row justify-between p-6 gap-6 flex-1">

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getLogoutFunction} from "@/context/authContext.tsx";
+import {getCheckTwoFaDialogFunction, getLogoutFunction} from "@/context/authContext.tsx";
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL
@@ -20,6 +20,12 @@ apiClient.interceptors.response.use(
         if (error.response?.status === 401) {
             const logout = getLogoutFunction();
             logout();
+        }
+        else if (error.response?.status === 403) {
+            if (error.response.data?.error === "TWO_FA_REQUIRED") {
+                const checkTwoFaDialog = getCheckTwoFaDialogFunction();
+                checkTwoFaDialog();
+            }
         }
         return Promise.reject(error);
     }

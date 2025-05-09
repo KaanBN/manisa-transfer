@@ -8,7 +8,6 @@ export const useLogin = () => {
             const token = data.data.token;
 
             localStorage.setItem("accessToken", token);
-            window.dispatchEvent(new Event("tokenChanged"));
         },
     });
 };
