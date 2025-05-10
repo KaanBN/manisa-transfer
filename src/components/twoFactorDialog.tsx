@@ -16,7 +16,7 @@ import { useAuth } from "@/context/authContext";
 const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [code, setCode] = useState<string>("");
-    const { login, twoFaState } = useAuth();
+    const { login, isTwoFaVerified } = useAuth();
 
     const {
         mutate: initiateMutate,
@@ -31,7 +31,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
     } = useVerifyTwoFa();
 
     useEffect(() => {
-        if (open && !twoFaState.isVerified) {
+        if (open && !isTwoFaVerified) {
             initiateMutate(undefined, {
                 onSuccess: (data) => {
                     setQrCode(data.data.qrCodeBase64);
@@ -70,7 +70,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                     <DialogTitle>İki-Adımlı Doğrulama</DialogTitle>
                     <DialogDescription>
                         {
-                            !twoFaState.isVerified ? "Authenticator uygulamanızı kullanarak Qr kodu okutun. Ardından oluşan kodu buraya girin" : "Authenticator uygulamanızda oluşan kodu girin"
+                            !isTwoFaVerified ? "Authenticator uygulamanızı kullanarak Qr kodu okutun. Ardından oluşan kodu buraya girin" : "Authenticator uygulamanızda oluşan kodu girin"
                         }
                     </DialogDescription>
                 </DialogHeader>
@@ -78,7 +78,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                 <div className="grid gap-4 py-4">
                     {(initiateIsLoading || verifyIsLoading) && <Spinner />}
 
-                    {!twoFaState.isVerified && qrCode && (
+                    {!isTwoFaVerified && qrCode && (
                         <img
                             src={`data:image/png;base64,${qrCode}`}
                             alt="QR Code"

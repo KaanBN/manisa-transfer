@@ -1,13 +1,11 @@
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {jwtDecode} from "jwt-decode";
-import {TwoFaState} from "@/types/twoFaStateType.ts";
 
 type JwtPayload = {
     userId: string;
     username: string;
     fullName: string;
     exp: number;
-    is2FaStarted: boolean;
     is2FaVerified: boolean;
     [key: string]: any;
 };
@@ -24,7 +22,7 @@ type AuthContextType = {
     user: AuthUser | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    twoFaState: TwoFaState;
+    isTwoFaVerified: boolean;
     isTwoFaDialogOpen: boolean;
     setIsTwoFaDialogOpen: (twoFaDialogOpen: boolean) => void;
     login: (token: string) => void;
@@ -51,10 +49,7 @@ export const getCheckTwoFaDialogFunction = () => checkTwoFaDialogFn;
 
 export const AuthProvider = ({children}: { children: ReactNode }) => {
     const [user, setUser] = useState<AuthUser | null>(null);
-    const [twoFaState, setTwoFaState] = useState<TwoFaState>({
-        isStarted: false,
-        isVerified: false,
-    })
+    const [isTwoFaVerified, setIs2FaVerified] = useState(false)
     const [isTwoFaDialogOpen, setIsTwoFaDialogOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -70,10 +65,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
                     token,
                     role: decoded.role
                 });
-                setTwoFaState({
-                    isStarted: String(decoded.is2FaStarted).toLowerCase() === 'true',
-                    isVerified: String(decoded.is2FaVerified).toLowerCase() === 'true'
-                });
+                setIs2FaVerified(String(decoded.is2FaVerified).toLowerCase() === 'true');
             } catch {
                 setUser(null);
             }
@@ -96,11 +88,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
             token,
             role: decoded.role
         });
-
-        setTwoFaState({
-            isStarted: String(decoded.is2FaStarted).toLowerCase() === 'true',
-            isVerified: String(decoded.is2FaVerified).toLowerCase() === 'true'
-        });
+        setIs2FaVerified(String(decoded.is2FaVerified).toLowerCase() === 'true');
     };
 
     const logout = () => {
@@ -109,7 +97,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
     };
 
     const checkTwoFaDialog = () => {
-        if (!!user && (!twoFaState.isStarted || !twoFaState.isVerified))
+        if (!!user && !isTwoFaVerified)
         {
             setIsTwoFaDialogOpen(true);
         }
@@ -121,15 +109,15 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
 
     useEffect(() => {
         checkTwoFaDialog();
-    }, [user, twoFaState.isStarted, twoFaState.isVerified]);
+    }, [user, isTwoFaVerified]);
 
     return (
         <AuthContext.Provider
             value={{
                 user,
-                isAuthenticated: !!user && twoFaState.isVerified,
+                isAuthenticated: !!user && isTwoFaVerified,
                 isLoading,
-                twoFaState,
+                isTwoFaVerified,
                 login,
                 logout,
                 isTwoFaDialogOpen,
