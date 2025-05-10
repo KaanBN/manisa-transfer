@@ -16,7 +16,8 @@ import { useAuth } from "@/context/authContext";
 const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [code, setCode] = useState<string>("");
-    const { login, isTwoFaVerified } = useAuth();
+
+    const { login, logout } = useAuth();
 
     const {
         mutate: initiateMutate,
@@ -31,10 +32,10 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
     } = useVerifyTwoFa();
 
     useEffect(() => {
-        if (open && !isTwoFaVerified) {
+        if (open) {
             initiateMutate(undefined, {
                 onSuccess: (data) => {
-                    setQrCode(data.data.qrCodeBase64);
+                    setQrCode(data.data?.qrCodeBase64 ?? null);
                 },
                 onError: () => toast.error("QR kod alınamadı."),
             });
@@ -70,7 +71,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                     <DialogTitle>İki-Adımlı Doğrulama</DialogTitle>
                     <DialogDescription>
                         {
-                            !isTwoFaVerified ? "Authenticator uygulamanızı kullanarak Qr kodu okutun. Ardından oluşan kodu buraya girin" : "Authenticator uygulamanızda oluşan kodu girin"
+                            qrCode ? "Authenticator uygulamanızı kullanarak Qr kodu okutun. Ardından oluşan kodu buraya girin" : "Authenticator uygulamanızda oluşan kodu girin"
                         }
                     </DialogDescription>
                 </DialogHeader>
@@ -78,7 +79,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                 <div className="grid gap-4 py-4">
                     {(initiateIsLoading || verifyIsLoading) && <Spinner />}
 
-                    {!isTwoFaVerified && qrCode && (
+                    {qrCode && (
                         <img
                             src={`data:image/png;base64,${qrCode}`}
                             alt="QR Code"
@@ -103,13 +104,24 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                     </div>
 
 
-                    <Button
-                        onClick={handleVerify}
-                        disabled={verifyIsLoading || code.length !== 6}
-                        className="mt-2"
-                    >
-                        Doğrula
-                    </Button>
+                    <div className={"flex flex-col"}>
+                        <Button
+                            onClick={handleVerify}
+                            disabled={verifyIsLoading || code.length !== 6}
+                            className="mt-2"
+                        >
+                            Doğrula
+                        </Button>
+
+                        <Button
+                            onClick={logout}
+                            disabled={verifyIsLoading}
+                            variant={"destructive"}
+                            className="mt-2"
+                        >
+                            İptal Et
+                        </Button>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

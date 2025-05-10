@@ -1,7 +1,6 @@
 export type InitiateTwoFaResponse = {
     message: string;
-    data: {
-        jwtToken: string;
+    data?: {
         qrCodeBase64: string;
     }
 }
