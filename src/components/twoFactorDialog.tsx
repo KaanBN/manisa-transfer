@@ -16,6 +16,7 @@ import { useAuth } from "@/context/authContext";
 const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [code, setCode] = useState<string>("");
+    const [secretCode, setSecretCode] = useState<string | null>(null);
 
     const { login, logout } = useAuth();
 
@@ -36,6 +37,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
             initiateMutate(undefined, {
                 onSuccess: (data) => {
                     setQrCode(data.data?.qrCodeBase64 ?? null);
+                    setSecretCode(data.data?.secret ?? null);
                 },
                 onError: () => toast.error("QR kod alınamadı."),
             });
@@ -70,10 +72,17 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                 <DialogHeader>
                     <DialogTitle>İki-Adımlı Doğrulama</DialogTitle>
                     <DialogDescription>
-                        {
-                            qrCode ? "Authenticator uygulamanızı kullanarak Qr kodu okutun. Ardından oluşan kodu buraya girin" : "Authenticator uygulamanızda oluşan kodu girin"
-                        }
+                        {qrCode ? (
+                            <>
+                                Authenticator uygulamanızı kullanarak Qr kodu okutun. <br />
+                                Ya da Authenticator uygulamanıza şu kodu girin: {secretCode} <br />
+                                Ardından oluşan kodu buraya girin
+                            </>
+                        ) : (
+                            "Authenticator uygulamanızda oluşan kodu girin"
+                        )}
                     </DialogDescription>
+
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
