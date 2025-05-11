@@ -2,12 +2,19 @@ import apiClient from "@/lib/axios.ts";
 
 type DownloadFileProps = {
     shareId: number;
+    twoFaCode: string;
 };
 
-export const downloadShare = async ({shareId}: DownloadFileProps) => {
-    const response = await apiClient.get(`/files/download/${shareId}`,{
-        responseType: "blob",
-    });
+export const downloadShare = async ({shareId, twoFaCode}: DownloadFileProps) => {
+    const response = await apiClient.get(
+        `/files/download/${shareId}`,
+        {
+            responseType: "blob",
+            headers: {
+                "X-2FA-Code": twoFaCode,
+            },
+        }
+    );
 
 
     const disposition = response.headers['content-disposition'];

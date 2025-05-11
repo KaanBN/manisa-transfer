@@ -25,6 +25,7 @@ import {useDebounce} from "@/hooks/useDebounce.ts";
 import {toast} from "sonner";
 import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
 import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
+import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
 
 type SharedByMeTabContentProps = {
     onDataReady?: () => void;
@@ -39,6 +40,11 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [singleDownloadFileIds, setSingleDownloadFileIds] = useState<string[]>([]);
+    const [showDownloadDialog, setShowDownloadDialog] = useState(false);
+    const [showTwoFaDialog, setShowTwoFaDialog] = useState(false);
+    const [selectedShare, setSelectedShare] = useState<ShareModel>();
+
 
     const userNameFilter = columnFilters.find((f) => f.id === "userName")?.value as string | undefined;
     const debouncedUserName = useDebounce(userNameFilter, 500);
@@ -92,9 +98,6 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     }, [data, isPlaceholderData, isPending]);
 
     const {mutate: downloadMutate, isPending: downloadPending} = useDownloadFile();
-
-    const [showDialog, setShowDialog] = useState(false);
-    const [selectedShare, setSelectedShare] = useState<ShareModel>();
 
     const columns = React.useMemo<ColumnDef<ShareModel>[]>(() => [
         {
@@ -254,13 +257,11 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                     if (shareFileIds.length === 0) return;
 
                     if (shareFileIds.length === 1) {
-                        downloadMutate({
-                            shareFileIdList: shareFileIds,
-                            onDownloadProgress: setDownloadProgress
-                        });
+                        setSingleDownloadFileIds(shareFileIds);
+                        setShowTwoFaDialog(true);
                     } else {
                         setSelectedShare(rowData);
-                        setShowDialog(true);
+                        setShowDownloadDialog(true);
                     }
                 };
 
@@ -279,7 +280,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                 );
             }
         }
-    ], [setSelectedShare, setShowDialog, downloadMutate]);
+    ], [setSelectedShare, setShowDownloadDialog, downloadMutate]);
 
     const table = useReactTable({
         data: data?.data ?? [],
@@ -324,53 +325,71 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
     }
 
     return (
-        <div className="w-full h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={table.getAllColumns().length} className="text-center h-24">
-                                    Sonuç bulunamadı.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+        <>
+            {
+                showTwoFaDialog && (
+                    <TwoFactorDialog
+                        open={showTwoFaDialog}
+                        onSuccess={(token: string) => {
+                            downloadMutate({
+                                twoFaCode: token,
+                                shareFileIdList: singleDownloadFileIds,
+                                onDownloadProgress: setDownloadProgress,
+                            });
+                            setShowTwoFaDialog(false);
+                        }}
+                        onCancel={() => setShowTwoFaDialog(false)}
+                    />
 
+                )
+            }
             {
                 selectedShare && (
                     <DownloadFilesDialog
                         fileList={selectedShare.files}
-                        showFileListModal={showDialog}
-                        setShowFileListModal={setShowDialog}
+                        showFileListModal={showDownloadDialog}
+                        setShowFileListModal={setShowDownloadDialog}
                         downloadable={new Date(selectedShare.expireTime).getTime() > Date.now()}
                     />
                 )
             }
-        </div>
+            <div className="w-full h-full flex flex-col">
+                <div className="flex-1 overflow-y-auto rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <TableHead key={header.id}>
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={table.getAllColumns().length} className="text-center h-24">
+                                        Sonuç bulunamadı.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+        </>
     );
 });
 

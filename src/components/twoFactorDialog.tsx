@@ -11,14 +11,17 @@ import {
     InputOTPSlot,
     InputOTPSeparator,
 } from "@/components/ui/input-otp.tsx";
-import { useAuth } from "@/context/authContext";
 
-const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
+type TwoFactorDialogProps = {
+    open: boolean;
+    onSuccess: (token: string) => void;
+    onCancel?: () => void;
+}
+
+const TwoFactorDialog: React.FC<TwoFactorDialogProps> = ({ open, onSuccess, onCancel }) => {
     const [qrCode, setQrCode] = useState<string | null>(null);
     const [code, setCode] = useState<string>("");
     const [secretCode, setSecretCode] = useState<string | null>(null);
-
-    const { login, logout } = useAuth();
 
     const {
         mutate: initiateMutate,
@@ -46,17 +49,16 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
 
     const handleVerify = () => {
         verifyMutate(
-            {
-                code: code
-            },
+            { code },
             {
                 onSuccess: (data) => {
-                    login(data.data.token);
+                    onSuccess(data.data.token);
                     toast.success("2FA doğrulandı.");
                     setCode("");
                 },
                 onError: (error) => {
-                    toast.error(`Kod doğrulanırken hata: ${error}`);
+                    // @ts-ignore
+                    toast.error(error.response?.data?.message || "Kod doğrulanırken hata.");
                 },
             }
         );
@@ -113,7 +115,7 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                     </div>
 
 
-                    <div className={"flex flex-col"}>
+                    <div className="flex flex-col">
                         <Button
                             onClick={handleVerify}
                             disabled={verifyIsLoading || code.length !== 6}
@@ -123,9 +125,9 @@ const TwoFactorDialog: React.FC<{ open: boolean }> = ({ open }) => {
                         </Button>
 
                         <Button
-                            onClick={logout}
+                            onClick={onCancel}
                             disabled={verifyIsLoading}
-                            variant={"destructive"}
+                            variant="destructive"
                             className="mt-2"
                         >
                             İptal Et

@@ -32,6 +32,7 @@ import {toast} from "sonner";
 import {useDownloadShare} from "@/hooks/useDownloadShare.ts";
 import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
 import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
+import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
 
 const FileListPage = () => {
     const [pagination, setPagination] = useState({
@@ -41,10 +42,11 @@ const FileListPage = () => {
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
-
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [downloadDialogOpen, setDownloadDialogOpen] = useState(false);
     const [selectedShare, setSelectedShare] = useState<DetailedShareModel | null>(null);
+    const [showTwoFaDialog, setShowTwoFaDialog] = useState(false);
+    const [selectedShareId, setSelectedShareId] = useState<number>()
 
     const senderUsernameFilter = columnFilters.find((f) => f.id === "sender")?.value as string | undefined;
     const debouncedSenderUserName = useDebounce(senderUsernameFilter, 500);
@@ -270,7 +272,8 @@ const FileListPage = () => {
                 const rowData = row.original;
 
                 const handleDownloadAllClick = () => {
-                    downloadShareMutate({ shareId: rowData.id });
+                    setSelectedShareId(rowData.id)
+                    setShowTwoFaDialog(true);
                 };
 
                 const isExpired = new Date(rowData.expireTime).getTime() <= Date.now();
@@ -349,8 +352,6 @@ const FileListPage = () => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-
-
     if (isPending) {
         return (
             <AdminTabDiv>
@@ -373,61 +374,7 @@ const FileListPage = () => {
     }
 
     return (
-        <AdminTabDiv>
-            <div className="flex-1 overflow-y-auto rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
-                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                    </TableHead>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={table.getAllColumns().length} className="text-center h-24">
-                                    Sonuç bulunamadı.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            <div className="flex justify-end gap-2 mt-4">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Geri
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    İleri
-                </Button>
-            </div>
-
+        <>
             {selectedShare && (
                 <>
                     <AdminDeleteShareAlertDialog
@@ -445,7 +392,78 @@ const FileListPage = () => {
                     />
                 </>
             )}
-        </AdminTabDiv>
+            {
+                showTwoFaDialog && (
+                    <TwoFactorDialog
+                        open={showTwoFaDialog}
+                        onSuccess={(token: string) => {
+                            downloadShareMutate({
+                                twoFaCode: token,
+                                shareId: selectedShareId!
+                            });
+                            setShowTwoFaDialog(false);
+                        }}
+                        onCancel={() => setShowTwoFaDialog(false)}
+                    />
+
+                )
+            }
+            <AdminTabDiv>
+                <div className="flex-1 overflow-y-auto rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <TableHead key={header.id}>
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={table.getAllColumns().length} className="text-center h-24">
+                                        Sonuç bulunamadı.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Geri
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        İleri
+                    </Button>
+                </div>
+            </AdminTabDiv>
+        </>
     );
 }
 

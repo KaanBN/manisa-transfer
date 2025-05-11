@@ -10,6 +10,7 @@ export const useDownloadFile = (onSuccess?: () => void) => {
             if (onSuccess) onSuccess();
         },
         onError: (error) => {
+            console.log(error);
             const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage = axiosError.response?.data?.message || "Dosya indirilirken bir hata oluştu.";
             toast.error(errorMessage);
