@@ -265,11 +265,14 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                     }
                 };
 
+                const isExpired = new Date(rowData.expireTime).getTime() < Date.now()
+
                 return (
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={handleDownloadClick}
+                        disabled={downloadPending || isExpired}
                     >
                         {downloadPending ? (
                             <Label>{downloadProgress}%</Label>
