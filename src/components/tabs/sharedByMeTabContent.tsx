@@ -26,6 +26,7 @@ import {toast} from "sonner";
 import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
 import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
 import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
+import ExpandableTitleCell from "@/components/expandableTitleCell.tsx";
 
 type SharedByMeTabContentProps = {
     onDataReady?: () => void;
@@ -131,7 +132,7 @@ const SharedByMeTabContent = forwardRef<PaginationHandle, SharedByMeTabContentPr
                     }
                 />
             ),
-            cell: ({row}) => <div>{row.getValue("title")}</div>,
+            cell: ({ row }) => <ExpandableTitleCell text={row.getValue("title")} />,
         },
         {
             accessorKey: "uploadTime",

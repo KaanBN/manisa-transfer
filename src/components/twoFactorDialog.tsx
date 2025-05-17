@@ -37,6 +37,8 @@ const TwoFactorDialog: React.FC<TwoFactorDialogProps> = ({ open, onSuccess, onCa
 
     useEffect(() => {
         if (open) {
+            setQrCode(null);
+            setSecretCode(null);
             initiateMutate(undefined, {
                 onSuccess: (data) => {
                     setQrCode(data.data?.qrCodeBase64 ?? null);

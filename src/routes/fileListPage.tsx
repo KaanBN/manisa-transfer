@@ -33,6 +33,7 @@ import {useDownloadShare} from "@/hooks/useDownloadShare.ts";
 import {MonthYearRangePicker} from "@/components/monthYearDatePicker.tsx";
 import {TextColumnFilter} from "@/components/textColumnFilter.tsx";
 import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
+import ExpandableTitleCell from "@/components/expandableTitleCell.tsx";
 
 const FileListPage = () => {
     const [pagination, setPagination] = useState({
@@ -147,11 +148,8 @@ const FileListPage = () => {
                     }}
                 />
             ),
-            cell: ({row}) => {
-                return (
-                    <div className="font-medium">{row.getValue("title")}</div>
-                )
-            },
+            cell: ({ row }) => <ExpandableTitleCell text={row.getValue("title")} />,
+
         },
         {
             accessorKey: "uploadTime",

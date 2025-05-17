@@ -10,6 +10,7 @@ import {BrowserRouter} from 'react-router-dom';
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
+    // TODO: EĞER QR OLUŞTURURKEN İLKİNDE ÇALIŞMIYOSA STRİCT MODE KALDIR
     <StrictMode>
         <QueryClientProvider client={queryClient}>
             <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">

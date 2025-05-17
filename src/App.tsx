@@ -13,7 +13,6 @@ import FileListPage from "@/routes/fileListPage.tsx";
 import SettingsDialog from "@/components/admin/settingsDialog.tsx";
 import {useAuth} from "@/context/authContext.tsx";
 import TwoFactorDialog from "@/components/twoFactorDialog.tsx";
-import {toast} from "sonner";
 
 function App(): JSX.Element {
     const {theme} = useTheme()
@@ -59,7 +58,6 @@ function App(): JSX.Element {
                             open={isTwoFaDialogOpen}
                             onSuccess={function (token: string): void {
                                 login(token);
-                                toast.success("2FA doğrulandı.");
                             }}
                             onCancel={() => {
                                 logout()
