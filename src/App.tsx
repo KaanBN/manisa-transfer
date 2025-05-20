@@ -1,7 +1,7 @@
 import {JSX, useEffect, useState} from 'react';
 import bg from './assets/images/background.png';
 import bgDark from './assets/images/background-dark.png';
-import bgVideo from './assets/videos/background.mp4';
+import bgVideo from './assets/videos/background-slowed.mp4';
 import Navbar from "@/components/navbar";
 import {Toaster} from "@/components/ui/sonner.tsx";
 import {useTheme} from "@/context/themeProvider.tsx";
